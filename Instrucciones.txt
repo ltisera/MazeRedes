@@ -1,0 +1,6 @@
+Ingresar el nombre del mapa sin la extensión, por ejemplo "mapa.txt" seria mapa
+AWSD para moverse
+E para agarrar oro (O) o la llave (K) cuando te encuentres arriba
+El objetivo es llegar a la salida (S) habiendo conseguido la llave antes
+El G es el guardia, si tratas de pasar por donde esta el sin tener oro morís
+P = Pared C = Camino E = Entrada

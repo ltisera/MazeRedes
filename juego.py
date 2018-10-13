@@ -1,15 +1,21 @@
+from os import system, name
+from colorama import Fore, Back, Style
+
 RANGOVISTA = 4
 ORO = 0
 KEY = False
 
 
-def cargarMapa():
+def cargarMapa(mapa):
     lista = []
-    f = open("mapa.txt", "r")
-    if f.mode == 'r':
-        fl = f.readlines()
-        for x in fl:
-            lista.append(list(x.strip()))
+    try:
+        f = open(mapa + ".txt", "r")
+        if f.mode == 'r':
+            fl = f.readlines()
+            for x in fl:
+                lista.append(list(x.strip()))
+    except FileNotFoundError:
+        print("Archivo no encontrado\n")
     return lista
     """
     for x in range(len(lista)):
@@ -26,6 +32,16 @@ def posInicio(lista):
             pass
 
 
+def clear():
+    if name == 'nt':
+        _ = system('cls')
+
+    # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = system('clear')
+    return _
+
+
 def juego(lista):
     global KEY, ORO
     KEY = False
@@ -33,11 +49,16 @@ def juego(lista):
     rango = int(RANGOVISTA / 2)
     pos = posInicio(lista)
     comando = "y"
+    clear()
+    print("Oro Actual: " + str(ORO) + "\n\n")
     while (comando != "n"):
         imprimirMapa(rango, pos, lista)
         print("\n¿Que desea hacer? ", end="")
         comando = input()
-        print("")
+
+        clear()
+
+        print("Oro Actual: " + str(ORO))
         pos, error = controlarComando(comando.lower(), pos, lista)
         if error == "Muerte":
             comando = "n"
@@ -47,6 +68,9 @@ def juego(lista):
         elif lista[pos[0]][pos[1]] == "S":
             comando = "n"
             print("Ganaste!!!")
+        else:
+            print("\n")
+    clear()
 
 
 def controlarComando(comando, pos, lista):
@@ -65,13 +89,13 @@ def controlarComando(comando, pos, lista):
         if lista[nPos[0]][nPos[1]] == "K":
             KEY = True
             lista[nPos[0]][nPos[1]] = "C"
-            print("Llave encontrada", end="\n\n")
+            print("Llave encontrada", end="\t")
         elif lista[nPos[0]][nPos[1]] == "O":
             ORO += 1
             lista[nPos[0]][nPos[1]] = "C"
-            print("Oro encontrado, oro actual " + str(ORO), end="\n\n")
+            print("Oro encontrado", end="\t")
         else:
-            print("No hay nada que agarrar", end="\n\n")
+            print("No hay nada que agarrar", end="\t")
     elif comando == "n":
         pass
     else:
@@ -99,6 +123,7 @@ def controlarNPos(pos, lugar, lista):
             else:
                 ORO -= 1
                 lista[pos[0]][pos[1]] = "C"
+                print("Le pagaste al guardia", end="\t")
         if lugar == "S" and not KEY:
             error = "La salida esta cerrada"
     return error
@@ -123,6 +148,7 @@ def controlarFinDelMapa(pos, lista):
 
 
 def imprimirMapa(rango, pos, lista):
+    global KEY
 
     # Imprimir posicion
     print("    ", end="")
@@ -152,12 +178,33 @@ def imprimirMapa(rango, pos, lista):
             for y in range((pos[1] - rango), (pos[1] + rango + 1)):
                 if y >= 0 and y < len(lista[0]):
                     if x == pos[0] and y == pos[1]:
-                        print("J", end="")
+                        print(Back.MAGENTA + "J", end="")
                     else:
-                        print(lista[x][y], end="")
+                        z = lista[x][y]
+                        if z == "P":
+                            print(Back.BLUE, end="")
+                        elif z == "C":
+                            print(Back.WHITE + Fore.BLACK, end="")
+                        elif z == "O":
+                            print(Back.YELLOW, end="")
+                        elif z == "K":
+                            print(Back.CYAN, end="")
+                        elif z == "G":
+                            print(Back.RED, end="")
+                        elif z == "S":
+                            if KEY:
+                                print(Back.GREEN, end="")
+                            else:
+                                print(Back.RED, end="")
+                        elif z == "E":
+                            print(Back.GREEN, end="")
+                        print(z, end=Style.RESET_ALL)
             print("")
 
 
 if __name__ == "__main__":
-    lista = cargarMapa()
+    lista = []
+    while not lista:
+        print("ingrese el nombre del mapa ", end="")
+        lista = cargarMapa(input())
     juego(lista)
