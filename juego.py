@@ -20,7 +20,8 @@ def iniciar():
     mapas = cargarListaMapas("./Mapas/")
     jugarDeNuevo = True
     if not mapas:
-        print("Error al cargar los mapas")
+        print("\nError al cargar los mapas\n")
+        os.system("PAUSE")
     else:
         while jugarDeNuevo:
             clear()
@@ -28,7 +29,8 @@ def iniciar():
                 # Imprimir Lista
                 for m in range(len(mapas)):
                     print(str(m + 1) + ") " + mapas[m].capitalize())
-                print(str(len(mapas) + 1) + ") Salir")
+                print(str(len(mapas) + 1) + ") Instrucciones")
+                print(str(len(mapas) + 2) + ") Salir")
                 print("\nIngrese el numero del mapa ", end="")
 
                 # Manejar Opciones
@@ -36,6 +38,12 @@ def iniciar():
                 try:
                     opc += int(input())
                     if opc == len(mapas):
+                        clear()
+                        imprimirInstrucciones("./")
+                        print("")
+                        os.system("PAUSE")
+                        clear()
+                    elif opc == len(mapas) + 1:
                         quit()
                     else:
                         try:
@@ -52,11 +60,14 @@ def iniciar():
 
 def cargarListaMapas(carpeta):
     m = []
-    for archivo in os.listdir(carpeta):
-        nombre = os.path.join(carpeta, archivo)
-        if os.path.isfile(nombre):
-            if nombre.endswith(".txt"):
-                m.append((nombre.split(".txt")[0]).split(carpeta)[1])
+    try:
+        for archivo in os.listdir(carpeta):
+            nombre = os.path.join(carpeta, archivo)
+            if os.path.isfile(nombre):
+                if nombre.endswith(".txt"):
+                    m.append((nombre.split(".txt")[0]).split(carpeta)[1])
+    except FileNotFoundError:
+        pass
     return m
 
 
@@ -71,6 +82,17 @@ def cargarMapa(carpeta, mapa):
     except FileNotFoundError:
         print("Archivo no encontrado\n")
     return lista
+
+
+def imprimirInstrucciones(carpeta):
+    try:
+        f = open(carpeta + "Instrucciones.txt", "r", encoding='utf-8-sig')
+        if f.mode == 'r':
+            fl = f.readlines()
+            for x in fl:
+                print(x.strip())
+    except FileNotFoundError:
+        print("Archivo no encontrado\n")
 
 
 def juego(lista):
