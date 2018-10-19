@@ -61,7 +61,14 @@
             console.log("Click en 1")
         }
         function clckEnLogin2(){
-            console.log("Click en 2")
+            console.log("Click en 2");
+            FB.getLoginStatus(function(response) {
+                d = document.getElementById("AcaTenesTuBoton");
+                d.style.display="none"
+                i = document.getElementById("imgPerfil")
+                i.src = "//graph.facebook.com/"+response.authResponse.userID+"/picture"
+            });
+            
         }
     </script>
 
@@ -85,10 +92,13 @@
 
     <img id="imgPerfil" src="">
 
-    <div id="aparte" onclick="clckEnLogin1()">ESCRIBILE ALGO ADENTRO PA VERLO DIGAMOS
+    <div id="aparte" onclick="clckEnLogin1()">PONGO UNA FRASE MIA NO TUYA
 
-        <div id="AcaTenesTuBoton" class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
+        <div id="AcaTenesTuBoton" class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onlogin="clckEnLogin2()"></div>
+
     </div>
+
+ 
 
 
 
