@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>REdesTPsso</title>
+</head>
+
+
+
+<body>
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '187395018824701',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v3.1'
+            });
+      
+            FB.AppEvents.logPageView();   
+            console.log("Soy del FBI")
+            FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+        });
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+        
+        function statusChangeCallback(response){
+            console.log(response)
+            if(response.status == "connected"){
+                console.log("se conecto El usuario: " + response.authResponse.userID)
+                d = document.getElementById("AcaTenesTuBoton");
+                d.style.display="none"
+                i = document.getElementById("imgPerfil")
+                i.src = "//graph.facebook.com/"+response.authResponse.userID+"/picture"
+            }
+        };
+        window.closeSession = function(){
+            console.log("CERRATE")
+            FB.logout(function(response) {
+                console.log(response)
+            });
+            location.reload();
+            
+        }
+    </script>
+
+
+    
+    
+
+    
+    <script>
+        (function(d, s, id) {
+            console.log("Teclickop")
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = 'https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v3.1&appId=187395018824701&autoLogAppEvents=1';
+            fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <img id="imgPerfil" src="">
+    <div id="AcaTenesTuBoton" class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
+    <input type="button" value="Cerrar" onclick="closeSession()"></input>
+
+</body>
+</html>
