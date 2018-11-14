@@ -1,0 +1,7 @@
+Declaro Definase, utilizese y archivese
+
+Comandos que aceptara el serverf y sus funciones:
+
+Comandos de Personaje:
+    "arriba", "abajo", "izquierda", "derecha", "agarrar", "salir"
+    "w", "a", "s", "d", "e", "q"
