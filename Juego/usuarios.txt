@@ -1,0 +1,4 @@
+ussr: camila|pass: 1234
+ussr: lucas|pass: 1234
+ussr: nico|pass: 1234
+ussr: test|pass: 1234
