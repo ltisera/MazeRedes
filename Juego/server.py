@@ -4,6 +4,11 @@ import time
 from jugador import Jugador
 cfgTimeout = 1
 
+
+cadErr1 = "Error Seleccion de Opcion".encode()
+cadErr2 = "Error de Seleccion de menu".encode()
+
+
 lstComando = ["arriba", "abajo", "izquierda", "derecha", "agarrar", "salir",
               "w", "a", "s", "d", "e", "q"]
 
@@ -64,20 +69,40 @@ def run_server():
                                     jugador.sock.sendall("Valido".encode())
                                     jugador.estado = "Creditos"
                                 else:
-                                    jugador.sock.sendall("PUTO".encode())
-
-                        elif(jugador.estado == "Creditos"):
-                            print("Y EL ANILLO PA CUANDO")
-                            print(data)
+                                    jugador.sock.sendall(cadErr1.encode())
+                        
+                        elif(jugador.estado == "Mapas"):
                             if(data == "Mandame El Menu"):
-                                print("DALE")
                                 print(jugador.generarCreditos())
                                 jugador.sock.sendall(jugador.generarCreditos())
+
                             elif(data == "salir" or data == "s"):
                                 jugador.sock.sendall("Valido".encode())
                                 jugador.estado = "Conectado"
                             else:
-                                jugador.sock.sendall("PUTO".encode())
+                                jugador.sock.sendall(cadErr2)
+
+                        elif(jugador.estado == "Instrucciones"):
+                            if(data == "Mandame El Menu"):
+                                print(jugador.generarCreditos())
+                                jugador.sock.sendall(jugador.generarCreditos())
+
+                            elif(data == "salir" or data == "s"):
+                                jugador.sock.sendall("Valido".encode())
+                                jugador.estado = "Conectado"
+                            else:
+                                jugador.sock.sendall(cadErr2)
+
+                        elif(jugador.estado == "Creditos"):
+                            if(data == "Mandame El Menu"):
+                                print(jugador.generarCreditos())
+                                jugador.sock.sendall(jugador.generarCreditos())
+
+                            elif(data == "salir" or data == "s"):
+                                jugador.sock.sendall("Valido".encode())
+                                jugador.estado = "Conectado"
+                            else:
+                                jugador.sock.sendall(cadErr2)
 
                         elif(jugador.estado == "Jugando"):
                             if (data in lstComando):
