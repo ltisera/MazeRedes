@@ -4,11 +4,6 @@ import time
 from jugador import Jugador
 cfgTimeout = 1
 
-
-cadErr1 = "Error Seleccion de Opcion".encode()
-cadErr2 = "Error de Seleccion de menu".encode()
-
-
 lstComando = ["arriba", "abajo", "izquierda", "derecha", "agarrar", "salir",
               "w", "a", "s", "d", "e", "q"]
 
@@ -28,104 +23,107 @@ def run_server():
     lstClientAddress = []
     lstJugadores = []
     sCliente = None
-    client_address = None
+    cAddress = None
 
     while salir is not True:
         try:
             # Aca Aceptamos las conexiones de los clientes y validamos usuarios
-            sCliente, client_address = sServer.accept()
+            sCliente, cAddress = sServer.accept()
             sCliente.settimeout(cfgTimeout)
             if(sCliente is not None):
                 lstSCliente.append(sCliente)
-                lstClientAddress.append(client_address)
-                lstJugadores.append(Jugador(sCliente, client_address))
+                lstClientAddress.append(cAddress)
+                lstJugadores.append(Jugador(sCliente, cAddress, "./Mapas/"))
                 sCliente = None
-                client_address = None
+                cAddress = None
 
         except:
             pass
         try:
-            for jugador in lstJugadores:
-                # Recibe los datos en trozos y reetransmite
-                try:
-                    data = jugador.sock.recv(200).decode()
-
-                    if(data):
-                        if(jugador.estado == "Desconectado"):
-                            print("valido usuario")
-                            jugador.sock.sendall(jugador.crearJugador(data))
-
-                        elif(jugador.estado == "Conectado"):
-                            if(data == ("Mandame El Menu")):
-                                jugador.sock.sendall(jugador.generarMenu())
-                            else:
-                                if(data in "1"):
-                                    jugador.sock.sendall("Valido".encode())
-                                    jugador.estado = "Mapas"
-                                elif(data == "2"):
-                                    jugador.sock.sendall("Valido".encode())
-                                    jugador.estado = "Instrucciones"
-                                elif(data == "3"):
-                                    jugador.sock.sendall("Valido".encode())
-                                    jugador.estado = "Creditos"
-                                else:
-                                    jugador.sock.sendall(cadErr1.encode())
-                        
-                        elif(jugador.estado == "Mapas"):
-                            if(data == "Mandame El Menu"):
-                                print(jugador.generarCreditos())
-                                jugador.sock.sendall(jugador.generarCreditos())
-
-                            elif(data == "salir" or data == "s"):
-                                jugador.sock.sendall("Valido".encode())
-                                jugador.estado = "Conectado"
-                            else:
-                                jugador.sock.sendall(cadErr2)
-
-                        elif(jugador.estado == "Instrucciones"):
-                            if(data == "Mandame El Menu"):
-                                print(jugador.generarCreditos())
-                                jugador.sock.sendall(jugador.generarCreditos())
-
-                            elif(data == "salir" or data == "s"):
-                                jugador.sock.sendall("Valido".encode())
-                                jugador.estado = "Conectado"
-                            else:
-                                jugador.sock.sendall(cadErr2)
-
-                        elif(jugador.estado == "Creditos"):
-                            if(data == "Mandame El Menu"):
-                                print(jugador.generarCreditos())
-                                jugador.sock.sendall(jugador.generarCreditos())
-
-                            elif(data == "salir" or data == "s"):
-                                jugador.sock.sendall("Valido".encode())
-                                jugador.estado = "Conectado"
-                            else:
-                                jugador.sock.sendall(cadErr2)
-
-                        elif(jugador.estado == "Jugando"):
-                            if (data in lstComando):
-                                mensajeTS = "Esto es un comando valido"
-                                jugador.sock.sendall(mensajeTS.encode())
-                            else:
-                                mensajeTS = "ErrX"
-                                jugador.sock.sendall(mensajeTS.encode())
-                    else:
-                        print('no hay mas datos', jugador.address)
-                        jugador.sock.close()
-                        lstJugadores.remove(jugador)
-                        print("Cerrada la Conexion")
-                except:
-                    print("No data recibido")
-            time.sleep(0.05)
+            atenderJugadores(lstJugadores)
 
         finally:
             # Cerrando conexion
-            #print("Me aseguro que cierra la conexion MAthov")
-            #sCliente.close()
-            #salir = True
+            # print("Me aseguro que cierra la conexion MAthov")
+            # sCliente.close()
+            # salir = True
             pass
+
+
+def atenderJugadores(lstJugadores):
+    for jugador in lstJugadores:
+        # Recibe los datos en trozos y reetransmite
+        try:
+            data = jugador.sock.recv(200).decode()
+
+            if(data):
+                if(jugador.estado == "Desconectado"):
+                    jugador.sock.sendall(jugador.crearJugador(data))
+
+                elif(jugador.estado == "Conectado"):
+                    if(data == ("Mandame El Menu")):
+                        jugador.sock.sendall(jugador.generarMenu())
+                    elif(data in "1"):
+                        jugador.sock.sendall("Valido".encode())
+                        jugador.estado = "Mapas"
+                    elif(data == "2"):
+                        jugador.sock.sendall("Valido".encode())
+                        jugador.estado = "Instrucciones"
+                    elif(data == "3"):
+                        jugador.sock.sendall("Valido".encode())
+                        jugador.estado = "Creditos"
+                    else:
+                        jugador.sock.sendall("PUTO".encode())
+
+                elif(jugador.estado == "Mapas"):
+                    if(data == "Mandame El Menu"):
+                        jugador.sock.sendall(jugador.generarMapas())
+                    elif(jugador.mapas is not []):
+                        if(int(data) in range(1, len(jugador.mapas))):
+                            jugador.sock.sendall(jugador.traerMapa(data))
+                            jugador.estado = "Jugando"
+                    elif(data in ["salir", "s"]):
+                        jugador.sock.sendall("Valido".encode())
+                        jugador.estado = "Conectado"
+                    else:
+                        jugador.sock.sendall("PUTO".encode())
+
+                elif(jugador.estado in ["Instrucciones", "Creditos"]):
+                    if(data == "Mandame El Menu"):
+                        mandar = None
+                        if(jugador.estado == "Instrucciones"):
+                            mandar = jugador.generarInstrucciones()
+                        else:
+                            mandar = jugador.generarCreditos()
+                        jugador.sock.sendall(mandar)
+                    elif(data in ["salir", "s"]):
+                        jugador.sock.sendall("Valido".encode())
+                        jugador.estado = "Conectado"
+                    else:
+                        jugador.sock.sendall("PUTO".encode())
+
+                elif(jugador.estado == "Jugando"):
+                    if(data == "Mandame El Rango"):
+                        print("Mando el rango")
+                        jugador.sock.sendall(("rang: " + jugador.rango).encode())
+                    elif(data == "Mandame La Pos"):
+                        print("Mando la pos")
+                        jugador.sock.sendall(("pos : " + jugador.pos).encode())
+
+                    elif(data in lstComando):
+                        mensajeTS = "Esto es un comando valido"
+                        jugador.sock.sendall(mensajeTS.encode())
+                    else:
+                        mensajeTS = "ErrX"
+                        jugador.sock.sendall(mensajeTS.encode())
+            else:
+                print('no hay mas datos', jugador.address)
+                jugador.sock.close()
+                lstJugadores.remove(jugador)
+                print("Cerrada la Conexion")
+        except:
+            print("No data recibido")
+    time.sleep(0.05)
 
 
 if __name__ == '__main__':

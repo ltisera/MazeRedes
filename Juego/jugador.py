@@ -1,21 +1,27 @@
+import os
+
+
 class Jugador(object):
     """docstring for Jugador"""
 
-    def __init__(self, sCliente, clientAddress):
+    def __init__(self, sCliente, clientAddress, carpetaMapas):
         self.sock = sCliente
         self.address = clientAddress
         self.hasLlave = False
         self.cantOro = 0
-        self.pos = (0, 0)
+        self.pos = None
         self.rango = 4
         self.usuario = ""
         self.password = ""
         self.valido = False
         self.estado = "Desconectado"
+        self.mapa = ""
+        self.mapas = []
+        self.carpetaMapas = carpetaMapas
 
     def generarCreditos(self):
-        print("ME ROMPO ACA")
-        return("Creditos a, Camila,Nico,Lucs!!!".encode())
+        return("Creditos a:,Camila Mathov,"
+               "Nicolas Mateus,Lucas Tisera".encode())
 
     def crearJugador(self, cadena):
         self.usuario, self.password = cortarEncabezado(cadena)
@@ -24,8 +30,28 @@ class Jugador(object):
         return(self.estado.encode())
 
     def generarMenu(self):
+        return("Elegi Una Opcion,1)Cargar mapa,"
+               "2)Ver Instrucciones,3)Creditos".encode())
 
-        return("Elegi Una Opcion,1)Cargar mapa,2)Ver Instrucciones,3)Creditos".encode())
+    def traerMapa(self, mapa):
+        self.mapa = cargarMapa(self.carpetaMapas, self.mapas[int(mapa) - 1])
+        self.pos = posInicio(self.mapa)
+        return ("mapa:" + self.mapa).encode()
+
+    def generarMapas(self):
+        self.mapas = cargarListaMapas(self.carpetaMapas)
+        mandar = ""
+        for i in range(len(self.mapas)):
+            mandar += str(i + 1) + ") " + self.mapas[i].capitalize() + ","
+        return(mandar[:-1].encode())
+
+    def generarInstrucciones(self):
+        return ("AWSD para moverse,E para agarrar oro (O) o la llave (K)  cu"
+                "ando te encuentres arriba,N para salir,El objetivo es llega"
+                "r a la salida (S) habiendo conseguido la llave antes,El G e"
+                "s el guardia,si tratas de pasar por donde esta el sin tener"
+                " oro moris,P = Pared C = Camino E = Entrada".encode())
+
 
 """
     Funciones que utiliza la clase
@@ -45,6 +71,44 @@ def cortarEncabezado(cadena):
     usuario = cadena[6:cadena.find("|")]
     password = cadena[cadena.find("|") + 6:].strip()
     return (usuario, password)
+
+
+def cargarListaMapas(carpeta):
+    m = []
+    try:
+        for archivo in os.listdir(carpeta):
+            nombre = os.path.join(carpeta, archivo)
+            if os.path.isfile(nombre):
+                if nombre.endswith(".txt"):
+                    m.append((nombre.split(".txt")[0]).split(carpeta)[1])
+    except FileNotFoundError:
+        pass
+    return m
+
+
+def cargarMapa(carpeta, mapa):
+    mandar = ""
+    try:
+        f = open(carpeta + mapa + ".txt", "r")
+        if f.mode == 'r':
+            fl = f.readlines()
+            for x in fl:
+                mandar += str(x.strip()) + ","
+    except FileNotFoundError:
+        print("Archivo no encontrado\n")
+    return mandar[:-1]
+
+
+def posInicio(mapa):
+    lista = []
+    for linea in mapa.split(","):
+        lista.append(list(linea))
+    for x in range(len(lista)):
+        try:
+            return x, lista[x].index("E")
+        except ValueError:
+            pass
+    print("Mapa corrupto\n")
 
 
 if __name__ == '__main__':
