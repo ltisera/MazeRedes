@@ -2,6 +2,7 @@ import socket
 import sys
 import os
 
+estado = "Desconectado"
 
 def crearConexion():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -9,39 +10,51 @@ def crearConexion():
     server_address = ('localhost', 6666)
     print('conectando a ', server_address)
     sock.connect(server_address)
-    print("Conectado")
+    print("IAMecoNEcta")
     return sock
 
 
 def run_cliente():
-    print("Ingresa Usuario:")
-    usuario = input()
-    print("Ingresa password:")
-    password = input()
-    mensajetemp = "ussr: " + usuario + "|" + "pass: " + password
-    sock = crearConexion()
-    sock.sendall(mensajetemp.encode())
-    data = sock.recv(200)
-    print(data.decode())
+    global estado
     salir = False
     while salir is not True:
-        print("Entrame el dato que quere que le mande al sv:")
-        comando = input()
-        if(comando == "salir"):
-            salir = True
-        else:
+        if(estado == "Desconectado"):
+            sock = crearConexion()
+            estado = "Deslogueado"
 
-            try:
-                os.system('cls')
-                print('enviando', comando)
-                sock.sendall(comando.encode())
-                # Buscando respuesta
-                data = sock.recv(200)
-                print('recibiendo', data.decode())
+        if(estado == "Deslogueado"):
+            print("Ingresa Usuario:")
+            usuario = input()
+            print("Ingresa password:")
+            password = input()
+            mensajetemp = "ussr: " + usuario + "|" + "pass: " + password
+            sock.sendall(mensajetemp.encode())
+            data = sock.recv(200).decode()
+            print(data)
+            if(data == "Conectado"):
+                estado = "Conectado"
 
-            finally:
-                print('Comando enviado')
-    
+        elif(estado == "Conectado"):
+            sock.sendall("Mandame El Menu".encode())
+            print("ya mande data")
+            data = sock.recv(200).decode()
+            print(data)
+            lstMenu = data.split(",")
+            while(data != "Valido"):
+                os.system("cls")
+                for linea in lstMenu:
+                    print(linea)
+                eleccion = input()
+                sock.sendall(eleccion.encode())
+                data = sock.recv(200).decode()
+                
+
+
+
+
+
+
+
     sock.close()
 
 

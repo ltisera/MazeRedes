@@ -11,18 +11,25 @@ class Jugador(object):
         self.usuario = ""
         self.password = ""
         self.valido = False
-        self.estado = "None"
+        self.estado = "Desconectado"
+
+    def generarCreditos(self):
+        print("ME ROMPO ACA")
+        return("Creditos a, Camila,Nico,Lucs!!!".encode())
 
     def crearJugador(self, cadena):
         self.usuario, self.password = cortarEncabezado(cadena)
-        self.valido = validarUsuario(self.usuario, self.password)
-        return(self.valido)
+        if(validarUsuario(self.usuario, self.password)):
+            self.estado = "Conectado"
+        return(self.estado.encode())
 
+    def generarMenu(self):
 
-def cortarEncabezado(cadena):
-    usuario = cadena[6:cadena.find("|")]
-    password = cadena[cadena.find("|") + 6:].strip()
-    return (usuario, password)
+        return("Elegi Una Opcion,1)Cargar mapa,2)Ver Instrucciones,3)Creditos".encode())
+
+"""
+    Funciones que utiliza la clase
+"""
 
 
 def validarUsuario(usuario, password):
@@ -32,6 +39,12 @@ def validarUsuario(usuario, password):
         if(ussr == usuario and contra == password):
             return True
     return False
+
+
+def cortarEncabezado(cadena):
+    usuario = cadena[6:cadena.find("|")]
+    password = cadena[cadena.find("|") + 6:].strip()
+    return (usuario, password)
 
 
 if __name__ == '__main__':

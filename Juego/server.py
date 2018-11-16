@@ -41,34 +41,58 @@ def run_server():
             pass
         try:
             for jugador in lstJugadores:
-                print('Conectando con', jugador.address)
                 # Recibe los datos en trozos y reetransmite
-                if(jugador.valido is not True):
-                    try:
-                        data = jugador.sock.recv(200)
-                        jugador.sock.sendall(str(jugador.crearJugador(data.decode())).encode())
+                try:
+                    data = jugador.sock.recv(200).decode()
 
-                    except:
-                        pass
-                else:
-                    try:
-                        data = jugador.sock.recv(200)
-                        print('recibido ', data.decode())
-                        if(data):
-                            if (data.decode() in lstComando):
+                    if(data):
+                        if(jugador.estado == "Desconectado"):
+                            print("valido usuario")
+                            jugador.sock.sendall(jugador.crearJugador(data))
+
+                        elif(jugador.estado == "Conectado"):
+                            if(data == ("Mandame El Menu")):
+                                jugador.sock.sendall(jugador.generarMenu())
+                            else:
+                                if(data in "1"):
+                                    jugador.sock.sendall("Valido".encode())
+                                    jugador.estado = "Mapas"
+                                elif(data == "2"):
+                                    jugador.sock.sendall("Valido".encode())
+                                    jugador.estado = "Instrucciones"
+                                elif(data == "3"):
+                                    jugador.sock.sendall("Valido".encode())
+                                    jugador.estado = "Creditos"
+                                else:
+                                    jugador.sock.sendall("PUTO".encode())
+
+                        elif(jugador.estado == "Creditos"):
+                            print("Y EL ANILLO PA CUANDO")
+                            print(data)
+                            if(data == "Mandame El Menu"):
+                                print("DALE")
+                                print(jugador.generarCreditos())
+                                jugador.sock.sendall(jugador.generarCreditos())
+                            elif(data == "salir" or data == "s"):
+                                jugador.sock.sendall("Valido".encode())
+                                jugador.estado = "Conectado"
+                            else:
+                                jugador.sock.sendall("PUTO".encode())
+
+                        elif(jugador.estado == "Jugando"):
+                            if (data in lstComando):
                                 mensajeTS = "Esto es un comando valido"
                                 jugador.sock.sendall(mensajeTS.encode())
                             else:
                                 mensajeTS = "ErrX"
                                 jugador.sock.sendall(mensajeTS.encode())
-                        else:
-                            print('no hay mas datos', jugador.address)
-                            jugador.sock.close()
-                            lstJugadores.remove(jugador)
-
-                            break
-                    except:
-                        print("No data recibido")
+                    else:
+                        print('no hay mas datos', jugador.address)
+                        jugador.sock.close()
+                        lstJugadores.remove(jugador)
+                        print("Cerrada la Conexion")
+                except:
+                    print("No data recibido")
             time.sleep(0.05)
 
         finally:
