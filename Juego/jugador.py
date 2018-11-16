@@ -11,6 +11,7 @@ class Jugador(object):
         self.usuario = ""
         self.password = ""
         self.valido = False
+        self.estado = "None"
 
     def crearJugador(self, cadena):
         self.usuario, self.password = cortarEncabezado(cadena)

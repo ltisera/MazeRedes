@@ -4,8 +4,8 @@ import time
 from jugador import Jugador
 cfgTimeout = 1
 
-
-
+lstComando = ["arriba", "abajo", "izquierda", "derecha", "agarrar", "salir",
+              "w", "a", "s", "d", "e", "q"]
 
 
 def run_server():
@@ -27,7 +27,7 @@ def run_server():
 
     while salir is not True:
         try:
-            #Aca Aceptamos las conexiones de los clientes y validamos usuarios
+            # Aca Aceptamos las conexiones de los clientes y validamos usuarios
             sCliente, client_address = sServer.accept()
             sCliente.settimeout(cfgTimeout)
             if(sCliente is not None):
@@ -54,9 +54,13 @@ def run_server():
                     try:
                         data = jugador.sock.recv(200)
                         print('recibido ', data.decode())
-                        if data:
-                            print('enviando mensaje de vuelta al cliente')
-                            jugador.sock.sendall(data)
+                        if(data):
+                            if (data.decode() in lstComando):
+                                mensajeTS = "Esto es un comando valido"
+                                jugador.sock.sendall(mensajeTS.encode())
+                            else:
+                                mensajeTS = "ErrX"
+                                jugador.sock.sendall(mensajeTS.encode())
                         else:
                             print('no hay mas datos', jugador.address)
                             jugador.sock.close()
