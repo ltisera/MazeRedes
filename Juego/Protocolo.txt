@@ -1,0 +1,27 @@
+Declaro Definase, utilizese y archivese
+
+Comandos que aceptara el serverf y sus funciones:
+
+Comandos de Personaje:
+    "arriba", "abajo", "izquierda", "derecha", "agarrar", "salir"
+    "w", "a", "s", "d", "e", "q"
+
+Comandos de configuracion:
+    "cfgrango:r" donde r es el rango de vision
+    "cfgmapa:m" donde m es el mapa elegido
+
+Comandos que devuelve el server:
+    "1)Cargar mapa,2)Ver Instrucciones,3)Creditos"
+errores
+    "err:e" donde e es el numero de error 
+
+"PPPJP\nPC"
+
+Menu Principal:
+    -Elegir mapa
+    -Ver Instrucciones
+
+Estados del jugador:
+-Desconectado (espera un login)
+-Conectado (menu principal)
+-Jugando termina cuando muere o gana 
