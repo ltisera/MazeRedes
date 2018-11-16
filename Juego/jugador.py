@@ -1,6 +1,9 @@
 import os
 
 
+RANGOVISTA = 4
+
+
 class Jugador(object):
     """docstring for Jugador"""
 
@@ -10,7 +13,7 @@ class Jugador(object):
         self.hasLlave = False
         self.cantOro = 0
         self.pos = None
-        self.rango = 4
+        self.rango = int(RANGOVISTA / 2)
         self.usuario = ""
         self.password = ""
         self.valido = False
@@ -52,10 +55,69 @@ class Jugador(object):
                 "s el guardia,si tratas de pasar por donde esta el sin tener"
                 " oro moris,P = Pared C = Camino E = Entrada".encode())
 
+    def controlarComando(self, comando):
+        lista = convertirMapaALista(self.mapa)
+
+        nP = self.pos
+        error = aviso = ""
+
+        if comando == "a":
+            nP = (self.pos[0], self.pos[1] - 1)
+        elif comando == "d":
+            nP = (self.pos[0], self.pos[1] + 1)
+        elif comando == "w":
+            nP = (self.pos[0] - 1, self.pos[1])
+        elif comando == "s":
+            nP = (self.pos[0] + 1, self.pos[1])
+        elif comando == "e":
+            if lista[nP[0]][nP[1]] == "K":
+                self.hasLlave = True
+                lista[nP[0]][nP[1]] = "C"
+                aviso = "Llave encontrada"
+            elif lista[nP[0]][nP[1]] == "O":
+                self.oro += 1
+                lista[nP[0]][nP[1]] = "C"
+                aviso = "Oro encontrado"
+            else:
+                aviso = "No hay nada que agarrar"
+
+        error, aviso = controlarNPos(nP, lista[nP[0]][nP[1]], lista, aviso)
+
+        if error == "":
+            self.pos = nP
+
+        return self.pos, error, aviso
+
 
 """
     Funciones que utiliza la clase
 """
+
+def controlarNPos(pos, lugar, lista, aviso):
+    global KEY, ORO
+    error = ""
+    if controlarFinDeMapa(pos, len(lista), len(lista[0])):
+        error = "Fin del Mapa"
+    elif lugar != "C":
+        if lugar == "P":
+            error = "No se pueden atravesar las paredes"
+        if lugar == "G":
+            if ORO <= 0:
+                error = "Muerte"
+            else:
+                ORO -= 1
+                lista[pos[0]][pos[1]] = "C"
+                aviso = "Le pagaste al guardia"
+        if lugar == "S" and not KEY:
+            error = "La salida esta cerrada"
+    return error, aviso
+
+
+def convertirMapaALista(mapa):
+    lista = []
+    for linea in mapa.split(","):
+        lista.append(list(linea))
+    return lista
 
 
 def validarUsuario(usuario, password):
@@ -100,9 +162,7 @@ def cargarMapa(carpeta, mapa):
 
 
 def posInicio(mapa):
-    lista = []
-    for linea in mapa.split(","):
-        lista.append(list(linea))
+    lista = convertirMapaALista(mapa)
     for x in range(len(lista)):
         try:
             return x, lista[x].index("E")

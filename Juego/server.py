@@ -79,7 +79,7 @@ def atenderJugadores(lstJugadores):
                     if(data == "Mandame El Menu"):
                         jugador.sock.sendall(jugador.generarMapas())
                     elif(jugador.mapas is not []):
-                        if(int(data) in range(1, len(jugador.mapas))):
+                        if(int(data) in range(1, len(jugador.mapas) + 1)):
                             jugador.sock.sendall(jugador.traerMapa(data))
                             jugador.estado = "Jugando"
                     elif(data in ["salir", "s"]):
@@ -105,10 +105,10 @@ def atenderJugadores(lstJugadores):
                 elif(jugador.estado == "Jugando"):
                     if(data == "Mandame El Rango"):
                         print("Mando el rango")
-                        jugador.sock.sendall(("rang: " + jugador.rango).encode())
+                        jugador.sock.sendall(("rang: " + str(jugador.rango)).encode())
                     elif(data == "Mandame La Pos"):
                         print("Mando la pos")
-                        jugador.sock.sendall(("pos : " + jugador.pos).encode())
+                        jugador.sock.sendall(("pos : " + str(jugador.pos)).encode())
 
                     elif(data in lstComando):
                         mensajeTS = "Esto es un comando valido"

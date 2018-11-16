@@ -25,6 +25,7 @@ def run_cliente():
             estado = "Deslogueado"
 
         if(estado == "Deslogueado"):
+            os.system("cls")
             print("Ingresa Usuario:")
             usuario = input()
             print("Ingresa password:")
@@ -45,27 +46,25 @@ def run_cliente():
                     print(linea)
                 eleccion = input()
                 sock.sendall(eleccion.encode())
-                data = sock.recv(400).decode()
+                data = sock.recv(1000).decode()
                 if (str(data).find("mapa:") is not -1):
                     for linea in data[6:].split(","):
                         mapa.append(list(linea))
-                    print(mapa)
                     sock.sendall("Mandame El Rango".encode())
                     estado = "Jugando"
                     break
 
         elif(estado == "Jugando"):
-            print("El rango?")
             data = sock.recv(200).decode()
-            print("Me llego")
-            print(data)
             if(str(data).find("rang:") is not -1):
-                print("Entre")
                 rango = int(data[6:])
+                sock.sendall("Mandame La Pos".encode())
             elif(str(data).find("pos :") is not -1):
-                print("Entre")
-                imprimirMapa(rango, data[6:].split(","), mapa)
-            # sock.sendall("Mandame La Pos".encode())
+                os.system("cls")
+                imprimirMapa(rango, data[7:-1].split(","), mapa)
+                print("\n\n    ¿Que desea hacer? ", end="")
+                comando = input().lower()
+                sock.sendall(comando.encode())
 
     sock.close()
 
@@ -92,8 +91,8 @@ def imprimirMapa(r, pos, lista):
         print(str(x) + " |", end="")
 
         for y in range(len(lista[x])):
-            if (x >= (pos[0] - r) and x <= (pos[0] + r) and
-                y >= (pos[1] - r) and y <= (pos[1] + r)):
+            if (x >= (int(pos[0]) - r) and x <= (int(pos[0]) + r) and
+                y >= (int(pos[1]) - r) and y <= (int(pos[1]) + r)):
                     print(lista[x][y], end="")
             else:
                 print(" ", end="")
