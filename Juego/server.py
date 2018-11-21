@@ -1,6 +1,7 @@
 import socket
 import os
 import time
+import json
 from jugador import Jugador
 cfgTimeout = 1
 
@@ -56,14 +57,27 @@ def atenderJugadores(lstJugadores):
         # Recibe los datos en trozos y reetransmite
         try:
             data = jugador.sock.recv(200).decode()
+            try:
+                dicSinCheck = json.loads(data)
+                try:
+                    dicServer = checkJSON(dicSinCheck)
+                except DatoInvalido as e:
+                    print("Exc ocurrida: ", e)
+                    jugador.sock.sendall("El datono es valido")
 
+            except json.decoder.JSONDecodeError:
+                sendErr = json.dumps("No sos un tipo valido de datos")
+                jugador.sock.sendall(sendErr.encode())
+            """
+            Hay QUE REHACER DE ACA PARA ABAJO
+            """
             if(data):
                 if(data=="Lista de comandos de consola"):
                     print("aca: ", lstComandosConsola)
                     jugador.sock.sendall(str(lstComandosConsola).encode())
 
                 elif(jugador.estado == "Desconectado"):
-                    jugador.sock.sendall(jugador.crearJugador(data))
+                    jugador.sock.sendall(jugador.crearJugador(dicServer))
 
                 elif(jugador.estado == "Conectado"):
                     if(data == ("Mandame El Menu")):
@@ -126,9 +140,32 @@ def atenderJugadores(lstJugadores):
                 jugador.sock.close()
                 lstJugadores.remove(jugador)
                 print("Cerrada la Conexion")
-        except:
+        except socket.timeout:
             print("No data recibido")
     time.sleep(0.05)
+
+
+class DatoInvalido(Exception):
+    def __init__(self, valor):
+        self.valor = valor
+
+    def __str__(self):
+        return repr(self.valor)
+
+
+def checkJSON(jObjeto):
+    cantidad = 0
+    debeHaber = 0
+    print("El objeto Completo: ", jObjeto)
+    for i in jObjeto:
+        if(cantidad == 0):
+            debeHaber = jObjeto[i]
+        cantidad = cantidad + 1
+    print("cantidad: ", cantidad, " debeHaber: ", debeHaber)
+    if(cantidad - 1 != debeHaber):
+        raise DatoInvalido("El dato esta corrupto")
+    return jObjeto
+
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import socket
 import os
 import time
-
+import json
 estado = "Desconectado"
 
 
@@ -30,9 +30,20 @@ def run_cliente():
             usuario = input()
             print("Ingresa password:")
             password = input()
-            mensajetemp = "ussr: " + usuario + "|" + "pass: " + password
-            sock.sendall(mensajetemp.encode())
-            data = sock.recv(200).decode()
+
+            #mensajetemp = "ussr: " + usuario + "|" + "pass: " + password
+            mensajeInt = {}
+            mensajeInt["loggin"] = 23
+            mensajeInt["ussr"] = usuario
+            mensajeInt["password"] = password
+            
+            mensa = json.dumps(mensajeInt)
+            print("Esto es lo que le mando: ", mensa)
+            sock.sendall("EX".encode())
+            
+            data = sock.recv(199).decode()
+            print("estoy recibiendo: ",data)
+            os.system("pause")
             if(data == "Conectado"):
                 estado = "Conectado"
 

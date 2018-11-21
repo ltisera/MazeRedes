@@ -27,7 +27,10 @@ class Jugador(object):
                "Nicolas Mateus,Lucas Tisera".encode())
 
     def crearJugador(self, cadena):
-        self.usuario, self.password = cortarEncabezado(cadena)
+        #self.usuario, self.password = cortarEncabezado(cadena)
+        self.usuario = cadena.get("ussr")
+        self.password = cadena.get("password")
+
         if(validarUsuario(self.usuario, self.password)):
             self.estado = "Conectado"
         return(self.estado.encode())
