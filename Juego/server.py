@@ -6,6 +6,7 @@ cfgTimeout = 1
 
 lstComando = ["arriba", "abajo", "izquierda", "derecha", "agarrar", "salir",
               "w", "a", "s", "d", "e", "q"]
+lstComandosConsola = '"ussr: *tuUsuario*|pass: *tuContraseña*", "Mandame El Menu", "Salir"'
 
 
 def run_server():
@@ -57,7 +58,11 @@ def atenderJugadores(lstJugadores):
             data = jugador.sock.recv(200).decode()
 
             if(data):
-                if(jugador.estado == "Desconectado"):
+                if(data=="Lista de comandos de consola"):
+                    print("aca: ", lstComandosConsola)
+                    jugador.sock.sendall(str(lstComandosConsola).encode())
+
+                elif(jugador.estado == "Desconectado"):
                     jugador.sock.sendall(jugador.crearJugador(data))
 
                 elif(jugador.estado == "Conectado"):
