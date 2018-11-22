@@ -23,8 +23,8 @@ class Jugador(object):
         self.carpetaMapas = carpetaMapas
 
     def generarCreditos(self):
-        return("Creditos a:,Camila Mathov,"
-               "Nicolas Mateus,Lucas Tisera")
+        return("Creditos a:\nCamila Mathov\n"
+               "Nicolas Mateus\nLucas Tisera")
 
     def crearJugador(self, cadena):
         #self.usuario, self.password = cortarEncabezado(cadena)
@@ -43,7 +43,7 @@ class Jugador(object):
     def traerMapa(self, mapa):
         self.mapa = cargarMapa(self.carpetaMapas, self.mapas[int(mapa) - 1])
         self.pos = posInicio(self.mapa)
-        return ("mapa:" + self.mapa)
+        return (self.mapa)
 
     def generarMapas(self):
         self.mapas = cargarListaMapas(self.carpetaMapas)
@@ -53,11 +53,11 @@ class Jugador(object):
         return(mandar[:-1])
 
     def generarInstrucciones(self):
-        return ("AWSD para moverse,E para agarrar oro (O) o la llave (K)  cu"
-                "ando te encuentres arriba,N para salir,El objetivo es llega"
-                "r a la salida (S) habiendo conseguido la llave antes,El G e"
-                "s el guardia,si tratas de pasar por donde esta el sin tener"
-                " oro moris,P = Pared C = Camino E = Entrada")
+        return ("AWSD para moverse\nE para agarrar oro (O) o la llave (K)  cu"
+                "ando te encuentres arriba\nN para salir\nEl objetivo es llega"
+                "r a la salida (S) habiendo conseguido la llave antes\nEl G e"
+                "s el guardia\nsi tratas de pasar por donde esta el sin tener"
+                " oro moris\nP = Pared C = Camino E = Entrada")
 
     def controlarComando(self, comando):
         lista = convertirMapaALista(self.mapa)

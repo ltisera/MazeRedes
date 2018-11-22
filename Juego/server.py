@@ -14,20 +14,23 @@ lstComandosConsola = '"ussr: *tuUsuario*|pass: *tuContraseña*", "Mandame El Men
 
 secret_key = 'a15fg7s9h75q17a8'.encode()
 
+
 def encriptar(mensaje):
     mensaje = mensaje.rjust(768)
-    cipher = AES.new(secret_key,AES.MODE_ECB)
+    cipher = AES.new(secret_key, AES.MODE_ECB)
     msjCriptado = base64.b64encode(cipher.encrypt(mensaje.encode()))
     if(len(msjCriptado) > 1024):
         raise Exception("La encriptacion sobrepaso los 1024 bytes")
     return msjCriptado
 
+
 def desencriptar(mensajeEncriptado):
-    print("mensajeEncriptado: ",len(mensajeEncriptado))
-    cipher = AES.new(secret_key,AES.MODE_ECB)
+    print("mensajeEncriptado: ", len(mensajeEncriptado))
+    cipher = AES.new(secret_key, AES.MODE_ECB)
     msjDesencriptado = cipher.decrypt(base64.b64decode(mensajeEncriptado)).strip().decode()
-    print("msjDesencriptado: ",msjDesencriptado)
+    print("msjDesencriptado: ", msjDesencriptado)
     return msjDesencriptado
+
 
 def checkJSON(jObjeto):
     try:
@@ -93,9 +96,8 @@ def atenderJugadores(lstJugadores):
         # Recibe los datos en trozos y reetransmite
         try:
 
-
             data = desencriptar(jugador.sock.recv(1024))
-            print("dato recibido: ",data)
+            print("dato recibido: ", data)
             if(data):
                 if (checkJSON(data)):
                     dicServer = json.loads(data)
@@ -109,7 +111,9 @@ def atenderJugadores(lstJugadores):
                         jugador.sock.sendall(msgEncript)
 
                     elif(dicServer.get("menu") is not None):
-                        if(dicServer.get("comando") is None):
+                        com = dicServer.get("comando")
+                        if(com is None or com in ["q", "salir"]):
+                            # Menu Principal
                             preMsg = {}
                             preMsg["menu"] = 2
                             preMsg["dato"] = jugador.generarMenu()
@@ -117,26 +121,33 @@ def atenderJugadores(lstJugadores):
                             preMsg = json.dumps(preMsg)
                             print("Le mando el menu")
                             jugador.sock.sendall(encriptar(preMsg))
-                    
-                        else:
-                            print("entre aca")
+                        elif(dicServer.get("estado") == "principal"):
                             preMsg = {}
                             preMsg["menu"] = 2
-                            if(dicServer.get("comando") == "1"):  # Menu MAPAS
+                            if(com == "1"):  # Menu MAPAS
                                 preMsg["dato"] = jugador.generarMapas()
                                 preMsg["estado"] = "mapas"
                                 print("Le mando el menu de MAPAS")
-                            if(dicServer.get("comando") == "2"):  # INSTRUCCINES
+                            if(com == "2"):  # INSTRUCCINES
                                 preMsg["dato"] = jugador.generarInstrucciones()
                                 preMsg["estado"] = "instrucciones"
                                 print("Le mando INSTRUCCINES")
-                            if(dicServer.get("comando") == "3"):  # CREDITOS
+                            if(com == "3"):  # CREDITOS
                                 preMsg["dato"] = jugador.generarCreditos()
                                 preMsg["estado"] = "creditos"
                                 print("Le mando CREDITOS")
                             print("Esto es lo que mando (comando): ", preMsg)
                             preMsg = json.dumps(preMsg)
                             jugador.sock.sendall(encriptar(preMsg))
+                        if(dicServer.get("estado") == "mapas"):
+                            preMsg = {}
+                            preMsg["mapa"] = 3
+                            preMsg["dato"] = jugador.traerMapa(com)
+                            preMsg["rango"] = jugador.rango
+                            preMsg["pos"] = jugador.pos
+                            preMsg = json.dumps(preMsg)
+                            jugador.sock.sendall(encriptar(preMsg))
+
                 else:
                     sendErr = {}
                     sendErr["Error"] = 1

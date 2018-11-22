@@ -95,31 +95,37 @@ def run_cliente():
 
                 elif(estado == "Conectado"):
                     os.system("cls")
-                    if(data.get("dato") is not None):
+                    if(data.get("mapa") is not None):
+                        for linea in data.get("dato").split(","):
+                            print(linea)
+                            mapa.append(list(linea))
+                        print(mapa)
+                        rango = int(data.get("rango"))
+                        pos = int(data.get("pos")[0]), int(data.get("pos")[1])
+                        estado = "Jugando"
+                    elif(data.get("dato") is not None):
                         print(data.get("dato"))
                         eleccion = input()
 
-                        mensaje = jsonMenu(eleccion)
-                        sock.sendall(encriptar(mensaje))
-
-                    if(data.get("mapa") is not None):
-                        for linea in data.get("mapa").split(","):
-                            mapa.append(list(linea))
-                        rango = int(data.get("rango"))
-                        estado = "Jugando"
-
-                elif(estado == "Jugando"):
-                    if(data.get("pos") is not None):
-                        os.system("cls")
-                        imprimirMapa(rango, data.get("pos"), mapa)
-                        print("\n\n    ¿Que desea hacer? ", end="")
-                        comando = input().lower()
-
-                        mensaje["eleccion"] = 2
-                        mensaje["tipo"] = "Juego"
-                        mensaje["comando"] = comando
+                        mensaje = {}
+                        mensaje["menu"] = 2
+                        mensaje["comando"] = eleccion
+                        mensaje["estado"] = data.get("estado")
                         mensaje = json.dumps(mensaje)
                         sock.sendall(encriptar(mensaje))
+
+                elif(estado == "Jugando"):
+                    # if(data.get("pos") is not None):
+                    os.system("cls")
+                    imprimirMapa(rango, pos, mapa)
+                    print("\n\n    ¿Que desea hacer? ", end="")
+                    comando = input().lower()
+
+                    mensaje["eleccion"] = 2
+                    mensaje["tipo"] = "Juego"
+                    mensaje["comando"] = comando
+                    mensaje = json.dumps(mensaje)
+                    sock.sendall(encriptar(mensaje))
             else:
                 # No JSON
                 mensaje["Error"] = 1
@@ -159,18 +165,6 @@ def imprimirMapa(r, pos, lista):
                 print(" ", end="")
         print("")
 
-
-def jsonMenu(eleccion):
-    mensaje = {}
-    mensaje["menu"] = 2
-    mensaje["comando"] = eleccion
-    if(eleccion == "1"):
-        mensaje["estado"] = "mapas"
-    elif(eleccion == "2"):
-        mensaje["estado"] = "instrucciones"
-    elif(eleccion == "3"):
-        mensaje["estado"] = "creditos"
-    return json.dumps(mensaje)
 
 if __name__ == '__main__':
     run_cliente()
