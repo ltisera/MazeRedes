@@ -97,7 +97,6 @@ def atenderJugadores(lstJugadores):
 
             data = desencriptar(dataEncriptada)
 
-            print("mi data: ", data)
             if(data):
                 if (checkJSON(data)):
                     dicServer = json.loads(data)
@@ -106,7 +105,8 @@ def atenderJugadores(lstJugadores):
                         preMsg["loggin"] = 1
                         preMsg["valido"] = jugador.crearJugador(dicServer)
                         sendMsg = json.dumps(preMsg)
-                        jugador.sock.sendall(sendMsg.encode())
+
+                        jugador.sock.sendall(encriptar(sendMsg))
 
                 else:
                     sendErr = {}

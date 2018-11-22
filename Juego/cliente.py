@@ -9,14 +9,11 @@ estado = "Desconectado"
 secret_key = 'a15fg7s9h75q17a8'.encode()
 
 def encriptar(mensaje):
-    print("mensaje len cliente antes de rjust: ", len(mensaje))
     mensaje = mensaje.rjust(768)
-    print("mensaje len cliente DESPUES de rjust: ", len(mensaje))
     cipher = AES.new(secret_key,AES.MODE_ECB)
     msjCriptado = base64.b64encode(cipher.encrypt(mensaje.encode()))
     if(len(msjCriptado) > 1024):
         raise Exception("La encriptacion sobrepaso los 1024 bytes")
-        print("msjCriptado len: ", len(msjCriptado))
     return msjCriptado
 
 def desencriptar(mensajeEncriptado):
@@ -73,18 +70,16 @@ def run_cliente():
             mensajeInt["password"] = password
             
             mensa = json.dumps(mensajeInt)
-            print("Esto es lo que le mando: ", mensa)
 
             mensajeEncriptado = encriptar(mensa)
 
-            print("mensajeEncriptado len: ",len(mensajeEncriptado))
 
             sock.sendall(mensajeEncriptado)
             
 
-            data = sock.recv(1024).decode()
+            data = desencriptar(sock.recv(1024))
 
-            dataDecriptada = desencriptar(data)
+
 
             if(checkJSON(data)):
                 pass
