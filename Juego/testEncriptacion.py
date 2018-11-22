@@ -3,23 +3,25 @@ from Crypto.Cipher import AES
 
 
 def encriptar(mensaje):
+	key = 'una key facil as'.encode()
+	cipher = AES.new(key, AES.MODE_EAX)
 	return cipher.encrypt(mensaje.encode())
 
 def desencriptar(ciphertext):
-	return cipher.decrypt(ciphertext)
+	key = 'una key facil as'.encode()
+	cipher2 = AES.new(key, AES.MODE_EAX)
+	return cipher2.decrypt(ciphertext)
 
 
 
 if __name__ == '__main__':
-	key = 'una key facil as'.encode()
+
 	cadena = "Asd Abc 123 cadena"
-	cipher = AES.new(key, AES.MODE_CFB)
 
 	cadenaEncriptada = encriptar(cadena)
-	
-	print(cadena)
-	cadena2 = cadenaEncriptada
-	desencriptar(cadena2)
-	print(cadena2)
+	cadenaDesEncriptada = desencriptar(cadenaEncriptada)
+	print("Cadena sin encriptar: ", cadena)
+	print("Cadena encriptada: ", cadenaEncriptada)
+	print("Cadena desencriptada: ", cadenaDesEncriptada)
 	#cadenaDesEncriptada = desencriptar(cadenaEncriptada)
 	#print(cadenaDesEncriptada)
