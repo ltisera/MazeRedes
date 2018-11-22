@@ -11,7 +11,7 @@ def desencriptar(ciphertext):
 
 
 if __name__ == '__main__':
-	key = 'aadr48565asd84g5'.encode()
+	key = 'una key facil as'.encode()
 	cadena = "Asd Abc 123 cadena"
 	cipher = AES.new(key, AES.MODE_CFB)
 
