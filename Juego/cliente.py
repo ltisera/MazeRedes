@@ -68,28 +68,31 @@ def run_cliente():
             print("Ingresa password:")
             password = input()
 
-            mensaje["loggin"] = 2
+            mensaje["login"] = 2
             mensaje["ussr"] = usuario
             mensaje["password"] = password
             mensaje = json.dumps(mensaje)
             print("Esto es lo que le mando: ", mensaje)
-            sock.sendall(mensaje.encode())
+            sock.sendall(encriptar(mensaje))
 
             estado = "EsperandoLogin"
 
         else:
-            data = sock.recv().desencriptar()
+            data = desencriptar(sock.recv(1024))
+            print("asdasdasdasdadsd ",data)
             if checkJSON(data):
                 data = json.loads(data)
 
                 if(estado == "EsperandoLogin"):
-                    if (data.get("valido")):
+                    print("antes")
+                    if (data.get("valido") == True):
+                        print("despues")
                         estado = "Conectado"
-
                         mensaje["menu"] = 1
                         mensaje["tipo"] = "Principal"
-                        mensaje = json.dumps(mensaje)
-                        sock.sendall(mensaje.encriptar())
+                        mensajef = json.dumps(mensaje)
+                        sock.sendall(encriptar(mensajef))
+                        print("mande esto: ", mensaje)
 
                     else:
                         estado = "Deslogueado"
@@ -98,18 +101,15 @@ def run_cliente():
 
                 elif(estado == "Conectado"):
                     os.system("cls")
-                    if(data.get("lstMenu") is not None):
-                        print(data.get("lstMenu"))
-                        """lstMenu = data.get("lstMenu").split(",")
-                        for linea in lstMenu:
-                            print(linea)"""
+                    if(data.get("dato") is not None):
+                        print(data.get("dato"))
                         eleccion = input()
 
                         mensaje["eleccion"] = 2
                         mensaje["tipo"] = "Principal"
                         mensaje["comando"] = eleccion
                         mensaje = json.dumps(mensaje)
-                        sock.sendall(mensaje.encriptar())
+                        sock.sendall(encriptar(mensaje))
 
                     if(data.get("mapa") is not None):
                         for linea in data.get("mapa").split(","):
@@ -128,13 +128,13 @@ def run_cliente():
                         mensaje["tipo"] = "Juego"
                         mensaje["comando"] = comando
                         mensaje = json.dumps(mensaje)
-                        sock.sendall(mensaje.encriptar())
+                        sock.sendall(encriptar(mensaje))
             else:
                 # No JSON
                 mensaje["Error"] = 1
                 mensaje["Causa"] = "No sos un tipo valido de datos"
                 mensaje = json.dumps(mensaje)
-                sock.sendall(mensaje.encriptar())
+                sock.sendall(encriptar(mensaje))
 
     sock.close()
 

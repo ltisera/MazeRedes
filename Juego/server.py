@@ -92,32 +92,66 @@ def atenderJugadores(lstJugadores):
     for jugador in lstJugadores:
         # Recibe los datos en trozos y reetransmite
         try:
-            dataEncriptada = jugador.sock.recv(1024)
 
 
-            data = desencriptar(dataEncriptada)
-
+            data = desencriptar(jugador.sock.recv(1024))
+            print("dato recibido: ",data)
             if(data):
                 if (checkJSON(data)):
                     dicServer = json.loads(data)
-                    if(jugador.estado == "Desconectado"):
+                    print("dicServer: ", dicServer.get("login"))
+                    if(dicServer.get("login") is not None):
                         preMsg = {}
-                        preMsg["loggin"] = 1
+                        preMsg["login"] = 1
                         preMsg["valido"] = jugador.crearJugador(dicServer)
                         sendMsg = json.dumps(preMsg)
+                        msgEncript = encriptar(sendMsg)
+                        jugador.sock.sendall(msgEncript)
 
-                        jugador.sock.sendall(encriptar(sendMsg))
+                    elif(dicServer.get("menu") != None):
+                        if(dicServer.get("tipo") == "Principal"):
+                            preMsg = {}
+                            preMsg["menu"] = 1
+                            preMsg["dato"] = jugador.generarMenu()
+                            preMsg = json.dumps(preMsg)
+                            print("Le mando el menu")
+                            jugador.sock.sendall(encriptar(preMsg))
 
                 else:
                     sendErr = {}
                     sendErr["Error"] = 1
                     sendErr["Causa"] = "No sos un tipo valido de datos"
                     errMsg = json.dumps(sendErr)
-                    jugador.sock.sendall(errMsg.encode())
+                    jugador.sock.sendall(encriptar(errMsg))
+            else:
+                print('no hay mas datos', jugador.address)
+                jugador.sock.close()
+                lstJugadores.remove(jugador)
+                print("Cerrada la Conexion")
 
+        except socket.timeout:
+            print("No data recibido")
+    time.sleep(0.05)
+
+
+class DatoInvalido(Exception):
+    def __init__(self, valor):
+        self.valor = valor
+
+    def __str__(self):
+        return repr(self.valor)
+
+"""
+Documentar checkJSON
+"""
+
+if __name__ == '__main__':
+    run_server()
+
+    """
             if(jugador.estado == "Conectado"):
                 if(data == ("Mandame El Menu")):
-                    jugador.sock.sendall(jugador.generarMenu())
+                    jugador.sock.sendall(encriptar(jugador.generarMenu()))
                 elif(data in "1"):
                     jugador.sock.sendall("Valido".encode())
                     jugador.estado = "Mapas"
@@ -171,26 +205,4 @@ def atenderJugadores(lstJugadores):
                 else:
                     mensajeTS = "ErrX"
                     jugador.sock.sendall(mensajeTS.encode())
-            else:
-                print('no hay mas datos', jugador.address)
-                jugador.sock.close()
-                lstJugadores.remove(jugador)
-                print("Cerrada la Conexion")
-        except socket.timeout:
-            print("No data recibido")
-    time.sleep(0.05)
-
-
-class DatoInvalido(Exception):
-    def __init__(self, valor):
-        self.valor = valor
-
-    def __str__(self):
-        return repr(self.valor)
-
-"""
-Documentar checkJSON
-"""
-
-if __name__ == '__main__':
-    run_server()
+    """

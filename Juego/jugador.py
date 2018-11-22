@@ -37,8 +37,8 @@ class Jugador(object):
         return(usvalido)
 
     def generarMenu(self):
-        return("Elegi Una Opcion,1)Cargar mapa,"
-               "2)Ver Instrucciones,3)Creditos".encode())
+        return("Elegi Una Opcion\n1)Cargar mapa\n"
+               "2)Ver Instrucciones\n3)Creditos")
 
     def traerMapa(self, mapa):
         self.mapa = cargarMapa(self.carpetaMapas, self.mapas[int(mapa) - 1])
