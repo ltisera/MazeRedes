@@ -98,10 +98,8 @@ def run_cliente():
                     if(data.get("dato") is not None):
                         print(data.get("dato"))
                         eleccion = input()
-                        mensaje["menu"] = 1
-                        mensaje["comando"] = eleccion
-                        mensaje["estado"] = data.get("estado")
-                        mensaje = json.dumps(mensaje)
+
+                        mensaje = jsonMenu(eleccion)
                         sock.sendall(encriptar(mensaje))
 
                     if(data.get("mapa") is not None):
@@ -161,6 +159,18 @@ def imprimirMapa(r, pos, lista):
                 print(" ", end="")
         print("")
 
+
+def jsonMenu(eleccion):
+    mensaje = {}
+    mensaje["menu"] = 2
+    mensaje["comando"] = eleccion
+    if(eleccion == "1"):
+        mensaje["estado"] = "mapas"
+    elif(eleccion == "2"):
+        mensaje["estado"] = "instrucciones"
+    elif(eleccion == "3"):
+        mensaje["estado"] = "creditos"
+    return json.dumps(mensaje)
 
 if __name__ == '__main__':
     run_cliente()

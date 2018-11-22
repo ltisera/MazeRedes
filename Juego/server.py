@@ -109,32 +109,34 @@ def atenderJugadores(lstJugadores):
                         jugador.sock.sendall(msgEncript)
 
                     elif(dicServer.get("menu") is not None):
-                        if(dicServer.get("estado") == "principal"):
+                        if(dicServer.get("comando") is None):
                             preMsg = {}
-                            preMsg["menu"] = 1
+                            preMsg["menu"] = 2
                             preMsg["dato"] = jugador.generarMenu()
                             preMsg["estado"] = "principal"
                             preMsg = json.dumps(preMsg)
                             print("Le mando el menu")
                             jugador.sock.sendall(encriptar(preMsg))
-                    elif(dicServer.get("eleccion") is not None):
-                        preMsg = {}
-                        preMsg["menu"] = 1
-                        if(dicServer.get("comando") == 1):  # Menu MAPAS
-                            preMsg["dato"] = jugador.generarMapas()
-                            preMsg["estado"] = "mapas"
-                            print("Le mando el menu de MAPAS")
-                        if(dicServer.get("comando") == 2):  # INSTRUCCINES
-                            preMsg["dato"] = jugador.generarInstrucciones()
-                            preMsg["estado"] = "instrucciones"
-                            print("Le mando INSTRUCCINES")
-                        if(dicServer.get("comando") == 3):  # CREDITOS
-                            preMsg["dato"] = jugador.generarCreditos()
-                            preMsg["estado"] = "creditos"
-                            print("Le mando CREDITOS")
-
-                        preMsg = json.dumps(preMsg)
-                        jugador.sock.sendall(encriptar(preMsg))
+                    
+                        else:
+                            print("entre aca")
+                            preMsg = {}
+                            preMsg["menu"] = 2
+                            if(dicServer.get("comando") == "1"):  # Menu MAPAS
+                                preMsg["dato"] = jugador.generarMapas()
+                                preMsg["estado"] = "mapas"
+                                print("Le mando el menu de MAPAS")
+                            if(dicServer.get("comando") == "2"):  # INSTRUCCINES
+                                preMsg["dato"] = jugador.generarInstrucciones()
+                                preMsg["estado"] = "instrucciones"
+                                print("Le mando INSTRUCCINES")
+                            if(dicServer.get("comando") == "3"):  # CREDITOS
+                                preMsg["dato"] = jugador.generarCreditos()
+                                preMsg["estado"] = "creditos"
+                                print("Le mando CREDITOS")
+                            print("Esto es lo que mando (comando): ", preMsg)
+                            preMsg = json.dumps(preMsg)
+                            jugador.sock.sendall(encriptar(preMsg))
                 else:
                     sendErr = {}
                     sendErr["Error"] = 1
