@@ -72,28 +72,22 @@ def run_cliente():
             mensaje["ussr"] = usuario
             mensaje["password"] = password
             mensaje = json.dumps(mensaje)
-            print("Esto es lo que le mando: ", mensaje)
             sock.sendall(encriptar(mensaje))
 
             estado = "EsperandoLogin"
 
         else:
             data = desencriptar(sock.recv(1024))
-            print("asdasdasdasdadsd ",data)
             if checkJSON(data):
                 data = json.loads(data)
 
                 if(estado == "EsperandoLogin"):
-                    print("antes")
-                    if (data.get("valido") == True):
-                        print("despues")
+                    if (data.get("valido") is True):
                         estado = "Conectado"
                         mensaje["menu"] = 1
-                        mensaje["tipo"] = "Principal"
-                        mensajef = json.dumps(mensaje)
-                        sock.sendall(encriptar(mensajef))
-                        print("mande esto: ", mensaje)
-
+                        mensaje["estado"] = "Principal"
+                        mensaje = json.dumps(mensaje)
+                        sock.sendall(encriptar(mensaje))
                     else:
                         estado = "Deslogueado"
                         print("Usuario y/o contraseña incorrecto")
@@ -104,10 +98,9 @@ def run_cliente():
                     if(data.get("dato") is not None):
                         print(data.get("dato"))
                         eleccion = input()
-
-                        mensaje["eleccion"] = 1
-                        
+                        mensaje["menu"] = 1
                         mensaje["comando"] = eleccion
+                        mensaje["estado"] = data.get("estado")
                         mensaje = json.dumps(mensaje)
                         sock.sendall(encriptar(mensaje))
 

@@ -121,6 +121,7 @@ def atenderJugadores(lstJugadores):
                         preMsg["menu"] = 1
                         if(dicServer.get("comando") == 1):#Menu MAPAS
                             preMsg["dato"] = jugador.generarMapas()
+                            preMsg["dato"] = jugador.generarMapas()
                             print("Le mando el menu de MAPAS")                   
                         if(dicServer.get("comando") == 2):#INSTRUCCINES
                             preMsg["dato"] = jugador.generarInstrucciones()
