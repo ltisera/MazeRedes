@@ -1,6 +1,5 @@
 import socket
 import os
-import time
 import json
 from Crypto.Cipher import AES
 import base64
@@ -8,17 +7,20 @@ import base64
 estado = "Desconectado"
 secret_key = 'a15fg7s9h75q17a8'.encode()
 
+
 def encriptar(mensaje):
     mensaje = mensaje.rjust(768)
-    cipher = AES.new(secret_key,AES.MODE_ECB)
+    cipher = AES.new(secret_key, AES.MODE_ECB)
     msjCriptado = base64.b64encode(cipher.encrypt(mensaje.encode()))
     if(len(msjCriptado) > 1024):
         raise Exception("La encriptacion sobrepaso los 1024 bytes")
     return msjCriptado
 
+
 def desencriptar(mensajeEncriptado):
-    cipher = AES.new(secret_key,AES.MODE_ECB)
+    cipher = AES.new(secret_key, AES.MODE_ECB)
     return cipher.decrypt(base64.b64decode(mensajeEncriptado)).strip().decode()
+
 
 def checkJSON(jObjeto):
     try:
@@ -52,77 +54,87 @@ def run_cliente():
     mapa = []
     rango = None
     while salir is not True:
+
+        mensaje = {}
+
         if(estado == "Desconectado"):
             sock = crearConexion()
             estado = "Deslogueado"
 
-        if(estado == "Deslogueado"):
+        elif(estado == "Deslogueado"):
             os.system("cls")
             print("Ingresa Usuario:")
             usuario = input()
             print("Ingresa password:")
             password = input()
 
-            #mensajetemp = "ussr: " + usuario + "|" + "pass: " + password
-            mensajeInt = {}
-            mensajeInt["loggin"] = 2
-            mensajeInt["ussr"] = usuario
-            mensajeInt["password"] = password
-            
-            mensa = json.dumps(mensajeInt)
+            mensaje["loggin"] = 2
+            mensaje["ussr"] = usuario
+            mensaje["password"] = password
+            mensaje = json.dumps(mensaje)
+            print("Esto es lo que le mando: ", mensaje)
+            sock.sendall(mensaje.encode())
 
-            mensajeEncriptado = encriptar(mensa)
+            estado = "EsperandoLogin"
 
+        else:
+            data = sock.recv().desencriptar()
+            if checkJSON(data):
+                data = json.loads(data)
 
-            sock.sendall(mensajeEncriptado)
-            
+                if(estado == "EsperandoLogin"):
+                    if (data.get("valido")):
+                        estado = "Conectado"
 
-            data = desencriptar(sock.recv(1024))
+                        mensaje["menu"] = 1
+                        mensaje["tipo"] = "Principal"
+                        mensaje = json.dumps(mensaje)
+                        sock.sendall(mensaje.encriptar())
 
+                    else:
+                        estado = "Deslogueado"
+                        print("Usuario y/o contraseña incorrecto")
+                        os.system("pause")
 
+                elif(estado == "Conectado"):
+                    os.system("cls")
+                    if(data.get("lstMenu") is not None):
+                        print(data.get("lstMenu"))
+                        """lstMenu = data.get("lstMenu").split(",")
+                        for linea in lstMenu:
+                            print(linea)"""
+                        eleccion = input()
 
-            if(checkJSON(data)):
-                pass
+                        mensaje["eleccion"] = 2
+                        mensaje["tipo"] = "Principal"
+                        mensaje["comando"] = eleccion
+                        mensaje = json.dumps(mensaje)
+                        sock.sendall(mensaje.encriptar())
+
+                    if(data.get("mapa") is not None):
+                        for linea in data.get("mapa").split(","):
+                            mapa.append(list(linea))
+                        rango = int(data.get("rango"))
+                        estado = "Jugando"
+
+                elif(estado == "Jugando"):
+                    if(data.get("pos") is not None):
+                        os.system("cls")
+                        imprimirMapa(rango, data.get("pos"), mapa)
+                        print("\n\n    ¿Que desea hacer? ", end="")
+                        comando = input().lower()
+
+                        mensaje["eleccion"] = 2
+                        mensaje["tipo"] = "Juego"
+                        mensaje["comando"] = comando
+                        mensaje = json.dumps(mensaje)
+                        sock.sendall(mensaje.encriptar())
             else:
-                sendErr = {}
-                sendErr["Error"] = 1
-                sendErr["Causa"] = "No sos un tipo valido de datos"
-                errMsg = json.dumps(sendErr)
-                jugador.sock.sendall(errMsg.encode())
-            print("estoy recibiendo: ",data)
-            os.system("pause")
-            if(data == "Conectado"):
-                estado = "Conectado"
-
-        elif(estado == "Conectado"):
-            sock.sendall("Mandame El Menu".encode())
-            data = sock.recv(400).decode()
-            lstMenu = data.split(",")
-            while(data != "Valido"):
-                os.system("cls")
-                for linea in lstMenu:
-                    print(linea)
-                eleccion = input()
-                sock.sendall(eleccion.encode())
-                data = sock.recv(1000).decode()
-                if (str(data).find("mapa:") is not -1):
-                    for linea in data[6:].split(","):
-                        mapa.append(list(linea))
-                    sock.sendall("Mandame El Rango".encode())
-                    estado = "Jugando"
-                    break
-
-        elif(estado == "Jugando"):
-            data = sock.recv(200).decode()
-            if(str(data).find("rang:") is not -1):
-                rango = int(data[6:])
-                sock.sendall("Mandame La Pos".encode())
-            elif(str(data).find("pos :") is not -1):
-                os.system("cls")
-                imprimirMapa(rango, data[7:-1].split(","), mapa)
-                print("\n\n    ¿Que desea hacer? ", end="")
-                comando = input().lower()
-                sock.sendall(comando.encode())
+                # No JSON
+                mensaje["Error"] = 1
+                mensaje["Causa"] = "No sos un tipo valido de datos"
+                mensaje = json.dumps(mensaje)
+                sock.sendall(mensaje.encriptar())
 
     sock.close()
 
@@ -155,7 +167,6 @@ def imprimirMapa(r, pos, lista):
             else:
                 print(" ", end="")
         print("")
-
 
 
 if __name__ == '__main__':
