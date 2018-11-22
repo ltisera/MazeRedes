@@ -5,6 +5,23 @@ import json
 estado = "Desconectado"
 
 
+def checkJSON(jObjeto):
+    try:
+        dato = json.loads(jObjeto)
+        cantidad = 0
+        debeHaber = 0
+        for i in dato:
+            if(cantidad == 0):
+                debeHaber = dato[i]
+            cantidad = cantidad + 1
+        if(cantidad - 1 != debeHaber):
+            return False
+        return True
+    except ValueError:
+        print("No soy jayson")
+        return False
+
+
 def crearConexion():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Conecta el socket en el puerto cuando el servidor esté escuchando
@@ -33,13 +50,13 @@ def run_cliente():
 
             #mensajetemp = "ussr: " + usuario + "|" + "pass: " + password
             mensajeInt = {}
-            mensajeInt["loggin"] = 23
+            mensajeInt["loggin"] = 2
             mensajeInt["ussr"] = usuario
             mensajeInt["password"] = password
             
             mensa = json.dumps(mensajeInt)
             print("Esto es lo que le mando: ", mensa)
-            sock.sendall("EX".encode())
+            sock.sendall(mensa.encode())
             
             data = sock.recv(199).decode()
             print("estoy recibiendo: ",data)
@@ -108,6 +125,9 @@ def imprimirMapa(r, pos, lista):
             else:
                 print(" ", end="")
         print("")
+
+
+
 
 
 if __name__ == '__main__':

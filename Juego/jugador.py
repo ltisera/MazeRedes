@@ -28,12 +28,13 @@ class Jugador(object):
 
     def crearJugador(self, cadena):
         #self.usuario, self.password = cortarEncabezado(cadena)
+        usvalido = False
         self.usuario = cadena.get("ussr")
         self.password = cadena.get("password")
 
         if(validarUsuario(self.usuario, self.password)):
-            self.estado = "Conectado"
-        return(self.estado.encode())
+            usvalido = True
+        return(usvalido)
 
     def generarMenu(self):
         return("Elegi Una Opcion,1)Cargar mapa,"
