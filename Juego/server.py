@@ -6,7 +6,7 @@ from jugador import Jugador
 from Crypto.Cipher import AES
 import base64
 
-cfgTimeout = 1
+cfgTimeout = 0
 
 lstComando = ["arriba", "abajo", "izquierda", "derecha", "agarrar", "salir",
               "w", "a", "s", "d", "e", "q"]
@@ -78,7 +78,7 @@ def run_server():
                 sCliente = None
                 cAddress = None
 
-        except socket.timeout:
+        except (socket.timeout, BlockingIOError):
             pass
         try:
             atenderJugadores(lstJugadores)
@@ -160,8 +160,8 @@ def atenderJugadores(lstJugadores):
                 lstJugadores.remove(jugador)
                 print("Cerrada la Conexion")
 
-        except socket.timeout:
-            print("No data recibido")
+        except (socket.timeout, BlockingIOError):
+            pass
     time.sleep(0.05)
 
 

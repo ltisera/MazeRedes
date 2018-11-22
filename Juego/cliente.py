@@ -97,11 +97,10 @@ def run_cliente():
                     os.system("cls")
                     if(data.get("mapa") is not None):
                         for linea in data.get("dato").split(","):
-                            print(linea)
                             mapa.append(list(linea))
-                        print(mapa)
                         rango = int(data.get("rango"))
                         pos = int(data.get("pos")[0]), int(data.get("pos")[1])
+                        print("Cambio estado")
                         estado = "Jugando"
                     elif(data.get("dato") is not None):
                         print(data.get("dato"))
@@ -114,9 +113,11 @@ def run_cliente():
                         mensaje = json.dumps(mensaje)
                         sock.sendall(encriptar(mensaje))
 
-                elif(estado == "Jugando"):
+                if(estado == "Jugando"):
                     # if(data.get("pos") is not None):
+                    
                     os.system("cls")
+                    print("YEAHHHHH BITCXH")
                     imprimirMapa(rango, pos, mapa)
                     print("\n\n    ¿Que desea hacer? ", end="")
                     comando = input().lower()
