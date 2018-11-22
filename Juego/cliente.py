@@ -105,8 +105,8 @@ def run_cliente():
                         print(data.get("dato"))
                         eleccion = input()
 
-                        mensaje["eleccion"] = 2
-                        mensaje["tipo"] = "Principal"
+                        mensaje["eleccion"] = 1
+                        
                         mensaje["comando"] = eleccion
                         mensaje = json.dumps(mensaje)
                         sock.sendall(encriptar(mensaje))
