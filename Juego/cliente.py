@@ -2,8 +2,26 @@ import socket
 import os
 import time
 import json
-estado = "Desconectado"
+from Crypto.Cipher import AES
+import base64
 
+estado = "Desconectado"
+secret_key = 'a15fg7s9h75q17a8'.encode()
+
+def encriptar(mensaje):
+    print("mensaje len cliente antes de rjust: ", len(mensaje))
+    mensaje = mensaje.rjust(768)
+    print("mensaje len cliente DESPUES de rjust: ", len(mensaje))
+    cipher = AES.new(secret_key,AES.MODE_ECB)
+    msjCriptado = base64.b64encode(cipher.encrypt(mensaje.encode()))
+    if(len(msjCriptado) > 1024):
+        raise Exception("La encriptacion sobrepaso los 1024 bytes")
+        print("msjCriptado len: ", len(msjCriptado))
+    return msjCriptado
+
+def desencriptar(mensajeEncriptado):
+    cipher = AES.new(secret_key,AES.MODE_ECB)
+    return cipher.decrypt(base64.b64decode(mensajeEncriptado)).strip().decode()
 
 def checkJSON(jObjeto):
     try:
@@ -56,10 +74,20 @@ def run_cliente():
             
             mensa = json.dumps(mensajeInt)
             print("Esto es lo que le mando: ", mensa)
-            sock.sendall(mensa.encode())
+
+            mensajeEncriptado = encriptar(mensa)
+
+            print("mensajeEncriptado len: ",len(mensajeEncriptado))
+
+            sock.sendall(mensajeEncriptado)
             
-            data = sock.recv(199).decode()
+
+            data = sock.recv(1024).decode()
+
+            dataDecriptada = desencriptar(data)
+
             if(checkJSON(data)):
+                pass
             else:
                 sendErr = {}
                 sendErr["Error"] = 1
@@ -132,8 +160,6 @@ def imprimirMapa(r, pos, lista):
             else:
                 print(" ", end="")
         print("")
-
-
 
 
 

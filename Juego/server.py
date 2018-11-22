@@ -3,12 +3,31 @@ import os
 import time
 import json
 from jugador import Jugador
+from Crypto.Cipher import AES
+import base64
+
 cfgTimeout = 1
 
 lstComando = ["arriba", "abajo", "izquierda", "derecha", "agarrar", "salir",
               "w", "a", "s", "d", "e", "q"]
 lstComandosConsola = '"ussr: *tuUsuario*|pass: *tuContraseña*", "Mandame El Menu", "Salir"'
 
+secret_key = 'a15fg7s9h75q17a8'.encode()
+
+def encriptar(mensaje):
+    mensaje = mensaje.rjust(768)
+    cipher = AES.new(secret_key,AES.MODE_ECB)
+    msjCriptado = base64.b64encode(cipher.encrypt(mensaje.encode()))
+    if(len(msjCriptado) > 1024):
+        raise Exception("La encriptacion sobrepaso los 1024 bytes")
+    return msjCriptado
+
+def desencriptar(mensajeEncriptado):
+    print("mensajeEncriptado: ",len(mensajeEncriptado))
+    cipher = AES.new(secret_key,AES.MODE_ECB)
+    msjDesencriptado = cipher.decrypt(base64.b64decode(mensajeEncriptado)).strip().decode()
+    print("msjDesencriptado: ",msjDesencriptado)
+    return msjDesencriptado
 
 def checkJSON(jObjeto):
     try:
@@ -73,7 +92,12 @@ def atenderJugadores(lstJugadores):
     for jugador in lstJugadores:
         # Recibe los datos en trozos y reetransmite
         try:
-            data = jugador.sock.recv(200).decode()
+            dataEncriptada = jugador.sock.recv(1024)
+
+
+            data = desencriptar(dataEncriptada)
+
+            print("mi data: ", data)
             if(data):
                 if (checkJSON(data)):
                     dicServer = json.loads(data)
@@ -93,13 +117,6 @@ def atenderJugadores(lstJugadores):
 
             if(jugador.estado == "Conectado"):
                 if(data == ("Mandame El Menu")):
-
-
-            """
-            Hay QUE REHACER DE ACA PARA ABAJO
-            """
-                
-
                     jugador.sock.sendall(jugador.generarMenu())
                 elif(data in "1"):
                     jugador.sock.sendall("Valido".encode())
@@ -174,7 +191,6 @@ class DatoInvalido(Exception):
 """
 Documentar checkJSON
 """
-
 
 if __name__ == '__main__':
     run_server()
