@@ -59,6 +59,13 @@ def run_cliente():
             sock.sendall(mensa.encode())
             
             data = sock.recv(199).decode()
+            if(checkJSON(data)):
+            else:
+                sendErr = {}
+                sendErr["Error"] = 1
+                sendErr["Causa"] = "No sos un tipo valido de datos"
+                errMsg = json.dumps(sendErr)
+                jugador.sock.sendall(errMsg.encode())
             print("estoy recibiendo: ",data)
             os.system("pause")
             if(data == "Conectado"):

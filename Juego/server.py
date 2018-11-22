@@ -90,13 +90,16 @@ def atenderJugadores(lstJugadores):
                     sendErr["Causa"] = "No sos un tipo valido de datos"
                     errMsg = json.dumps(sendErr)
                     jugador.sock.sendall(errMsg.encode())
+
+            if(jugador.estado == "Conectado"):
+                if(data == ("Mandame El Menu")):
+
+
             """
             Hay QUE REHACER DE ACA PARA ABAJO
             """
                 
 
-            if(jugador.estado == "Conectado"):
-                if(data == ("Mandame El Menu")):
                     jugador.sock.sendall(jugador.generarMenu())
                 elif(data in "1"):
                     jugador.sock.sendall("Valido".encode())
