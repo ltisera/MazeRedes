@@ -85,7 +85,7 @@ def run_cliente():
                     if (data.get("valido") is True):
                         estado = "Conectado"
                         mensaje["menu"] = 1
-                        mensaje["estado"] = "Principal"
+                        mensaje["estado"] = "principal"
                         mensaje = json.dumps(mensaje)
                         sock.sendall(encriptar(mensaje))
                     else:

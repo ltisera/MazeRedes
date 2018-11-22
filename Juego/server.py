@@ -109,29 +109,32 @@ def atenderJugadores(lstJugadores):
                         jugador.sock.sendall(msgEncript)
 
                     elif(dicServer.get("menu") is not None):
-                        if(dicServer.get("tipo") == "Principal"):
+                        if(dicServer.get("estado") == "principal"):
                             preMsg = {}
                             preMsg["menu"] = 1
                             preMsg["dato"] = jugador.generarMenu()
+                            preMsg["estado"] = "principal"
                             preMsg = json.dumps(preMsg)
                             print("Le mando el menu")
                             jugador.sock.sendall(encriptar(preMsg))
                     elif(dicServer.get("eleccion") is not None):
                         preMsg = {}
                         preMsg["menu"] = 1
-                        if(dicServer.get("comando") == 1):#Menu MAPAS
+                        if(dicServer.get("comando") == 1):  # Menu MAPAS
                             preMsg["dato"] = jugador.generarMapas()
-                            preMsg["dato"] = jugador.generarMapas()
-                            print("Le mando el menu de MAPAS")                   
-                        if(dicServer.get("comando") == 2):#INSTRUCCINES
+                            preMsg["estado"] = "mapas"
+                            print("Le mando el menu de MAPAS")
+                        if(dicServer.get("comando") == 2):  # INSTRUCCINES
                             preMsg["dato"] = jugador.generarInstrucciones()
+                            preMsg["estado"] = "instrucciones"
                             print("Le mando INSTRUCCINES")
-                        if(dicServer.get("comando") == 3):#CREDITOS
+                        if(dicServer.get("comando") == 3):  # CREDITOS
                             preMsg["dato"] = jugador.generarCreditos()
+                            preMsg["estado"] = "creditos"
                             print("Le mando CREDITOS")
-                        
+
                         preMsg = json.dumps(preMsg)
-                        jugador.sock.sendall(encriptar(preMsg))    
+                        jugador.sock.sendall(encriptar(preMsg))
                 else:
                     sendErr = {}
                     sendErr["Error"] = 1
