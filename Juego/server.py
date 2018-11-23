@@ -175,6 +175,14 @@ def atenderJugadores(lstJugadores):
                                 preMsg["juego"] = cantParametros + 2
                                 preMsg = json.dumps(preMsg)
                                 jugador.sock.sendall(encriptar(preMsg))
+                        else:
+                            sendErr = {}
+                            sendErr["juego"] = 3
+                            sendErr["error"] = "Comando invalido"
+                            sendErr["pos"] = jugador.pos
+                            sendErr["oro"] = jugador.cantOro
+                            errMsg = json.dumps(sendErr)
+                            jugador.sock.sendall(encriptar(errMsg))
 
                 else:
                     sendErr = {}

@@ -105,7 +105,7 @@ class Jugador(object):
                     error = "No tenias suficiente oro y el guardia te mato"
                 else:
                     self.cantOro -= 1
-                    self.lista[pos[0]][pos[1]] = "C"
+                    self.lstMapa[pos[0]][pos[1]] = "C"
                     remplazo = pos
                     aviso = "Le pagaste al guardia"
             if self.lstMapa[pos[0]][pos[1]] == "S" and not self.hasLlave:
