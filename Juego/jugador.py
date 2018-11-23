@@ -19,6 +19,7 @@ class Jugador(object):
         self.valido = False
         self.estado = "Desconectado"
         self.mapa = ""
+        self.lstMapa = []
         self.mapas = []
         self.carpetaMapas = carpetaMapas
 
@@ -41,7 +42,7 @@ class Jugador(object):
                "2)Ver Instrucciones\n3)Creditos")
 
     def traerMapa(self, mapa):
-        self.mapa = cargarMapa(self.carpetaMapas, self.mapas[int(mapa) - 1])
+        self.mapa self.lstMapa = cargarMapa(self.carpetaMapas, self.mapas[int(mapa) - 1])
         self.pos = posInicio(self.mapa)
         return (self.mapa)
 
@@ -60,8 +61,6 @@ class Jugador(object):
                 " oro moris\nP = Pared C = Camino E = Entrada")
 
     def controlarComando(self, comando):
-        lista = convertirMapaALista(self.mapa)
-
         nP = self.pos
         error = aviso = ""
 
@@ -74,54 +73,50 @@ class Jugador(object):
         elif comando == "s":
             nP = (self.pos[0] + 1, self.pos[1])
         elif comando == "e":
-            if lista[nP[0]][nP[1]] == "K":
+            if self.lstMapa[nP[0]][nP[1]] == "K":
                 self.hasLlave = True
-                lista[nP[0]][nP[1]] = "C"
+                self.lstMapa[nP[0]][nP[1]] = "C"
                 aviso = "Llave encontrada"
-            elif lista[nP[0]][nP[1]] == "O":
+            elif self.lstMapa[nP[0]][nP[1]] == "O":
                 self.oro += 1
-                lista[nP[0]][nP[1]] = "C"
+                self.lstMapa[nP[0]][nP[1]] = "C"
                 aviso = "Oro encontrado"
             else:
                 aviso = "No hay nada que agarrar"
 
-        error, aviso = controlarNPos(nP, lista[nP[0]][nP[1]], lista, aviso)
+        error, aviso = self.controlarNPos(nP, aviso)
 
         if error == "":
             self.pos = nP
 
-        return self.pos, error, aviso
+        return error, aviso
+
+    def controlarNPos(self, pos, aviso):
+        error = ""
+        if controlarFinDeMapa(pos, len(self.lstMapa), len(self.lstMapa[0])):
+            error = "Fin del Mapa"
+        elif self.lstMapa[pos[0]][pos[1]] != "C":
+            if self.lstMapa[pos[0]][pos[1]] == "P":
+                error = "No se pueden atravesar las paredes"
+            if self.lstMapa[pos[0]][pos[1]] == "G":
+                if self.cantOro <= 0:
+                    error = "No tenias suficiente oro y el guardia te mato"
+                else:
+                    self.cantOro -= 1
+                    lista[pos[0]][pos[1]] = "C"
+                    aviso = "Le pagaste al guardia"
+            if self.lstMapa[pos[0]][pos[1]] == "S" and not self.hasLlave:
+                error = "La salida esta cerrada"
+        return error, aviso
 
 
 """
     Funciones que utiliza la clase
 """
 
-def controlarNPos(pos, lugar, lista, aviso):
-    global KEY, ORO
-    error = ""
-    if controlarFinDeMapa(pos, len(lista), len(lista[0])):
-        error = "Fin del Mapa"
-    elif lugar != "C":
-        if lugar == "P":
-            error = "No se pueden atravesar las paredes"
-        if lugar == "G":
-            if ORO <= 0:
-                error = "Muerte"
-            else:
-                ORO -= 1
-                lista[pos[0]][pos[1]] = "C"
-                aviso = "Le pagaste al guardia"
-        if lugar == "S" and not KEY:
-            error = "La salida esta cerrada"
-    return error, aviso
 
-
-def convertirMapaALista(mapa):
-    lista = []
-    for linea in mapa.split(","):
-        lista.append(list(linea))
-    return lista
+def controlarFinDeMapa(pos, lenX, lenY):
+    return (pos[0] >= lenX or pos[0] < 0 or pos[1] >= lenY or pos[1] < 0)
 
 
 def validarUsuario(usuario, password):
@@ -153,6 +148,7 @@ def cargarListaMapas(carpeta):
 
 
 def cargarMapa(carpeta, mapa):
+    lista = []
     mandar = ""
     try:
         f = open(carpeta + mapa + ".txt", "r")
@@ -160,9 +156,10 @@ def cargarMapa(carpeta, mapa):
             fl = f.readlines()
             for x in fl:
                 mandar += str(x.strip()) + ","
+                lista.append(list(x).strip())
     except FileNotFoundError:
         print("Archivo no encontrado\n")
-    return mandar[:-1]
+    return mandar[:-1], lista
 
 
 def posInicio(mapa):

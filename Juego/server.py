@@ -10,7 +10,6 @@ cfgTimeout = 0
 
 lstComando = ["arriba", "abajo", "izquierda", "derecha", "agarrar", "salir",
               "w", "a", "s", "d", "e", "q"]
-lstComandosConsola = '"ussr: *tuUsuario*|pass: *tuContraseña*", "Mandame El Menu", "Salir"'
 
 secret_key = 'a15fg7s9h75q17a8'.encode()
 
@@ -141,10 +140,27 @@ def atenderJugadores(lstJugadores):
                             jugador.sock.sendall(encriptar(preMsg))
                         if(dicServer.get("estado") == "mapas"):
                             preMsg = {}
-                            preMsg["mapa"] = 3
+                            preMsg["mapa"] = 4
                             preMsg["dato"] = jugador.traerMapa(com)
                             preMsg["rango"] = jugador.rango
                             preMsg["pos"] = jugador.pos
+                            preMsg["oro"] = jugador.cantOro
+                            preMsg = json.dumps(preMsg)
+                            jugador.sock.sendall(encriptar(preMsg))
+                    elif(dicServer.get("juego") is not None):
+                        if(dicServer.get("comando") in lstComando):
+                            preMsg = {}
+                            cantParametros = 0
+                            error, aviso = jugador.controlarComando(com)
+                            if (error != ""):
+                                preMsg["error"] = error
+                                cantParametros += 1
+                            if(aviso != ""):
+                                preMsg["aviso"] = aviso
+                                cantParametros += 1
+                            preMsg["pos"] = jugador.pos
+                            preMsg["oro"] = jugador.cantOro
+                            preMsg["juego"] = cantParametros + 2
                             preMsg = json.dumps(preMsg)
                             jugador.sock.sendall(encriptar(preMsg))
 

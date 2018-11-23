@@ -51,8 +51,6 @@ def crearConexion():
 def run_cliente():
     global estado
     salir = False
-    mapa = []
-    rango = None
     while salir is not True:
 
         mensaje = {}
@@ -96,11 +94,11 @@ def run_cliente():
                 elif(estado == "Conectado"):
                     os.system("cls")
                     if(data.get("mapa") is not None):
+                        mapa = []
+                        rango = None
                         for linea in data.get("dato").split(","):
                             mapa.append(list(linea))
                         rango = int(data.get("rango"))
-                        pos = int(data.get("pos")[0]), int(data.get("pos")[1])
-                        print("Cambio estado")
                         estado = "Jugando"
                     elif(data.get("dato") is not None):
                         print(data.get("dato"))
@@ -114,19 +112,24 @@ def run_cliente():
                         sock.sendall(encriptar(mensaje))
 
                 if(estado == "Jugando"):
-                    # if(data.get("pos") is not None):
-                    
-                    os.system("cls")
-                    print("YEAHHHHH BITCXH")
-                    imprimirMapa(rango, pos, mapa)
-                    print("\n\n    ¿Que desea hacer? ", end="")
-                    comando = input().lower()
+                    if(data.get("juego") is not None):
+                        pos = int(data.get("pos")[0]), int(data.get("pos")[1])
+                        os.system("cls")
 
-                    mensaje["eleccion"] = 2
-                    mensaje["tipo"] = "Juego"
-                    mensaje["comando"] = comando
-                    mensaje = json.dumps(mensaje)
-                    sock.sendall(encriptar(mensaje))
+                        imprimirMapa(rango, pos, mapa)
+                        print("\n    Oro Actual: " + data.get("oro"))
+                        if(data.get("error") is not None):
+                            print("    " + data.get("error"), end="\n\n")
+                        if(data.get("aviso") is not None):
+                            print("    " + data.get("aviso"), end="\n\n")
+                        print("\n\n    ¿Que desea hacer? ", end="")
+
+                        comando = input().lower()
+
+                        mensaje["juego"] = 1
+                        mensaje["comando"] = comando
+                        mensaje = json.dumps(mensaje)
+                        sock.sendall(encriptar(mensaje))
             else:
                 # No JSON
                 mensaje["Error"] = 1
