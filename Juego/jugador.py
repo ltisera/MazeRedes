@@ -42,8 +42,8 @@ class Jugador(object):
                "2)Ver Instrucciones\n3)Creditos")
 
     def traerMapa(self, mapa):
-        self.mapa self.lstMapa = cargarMapa(self.carpetaMapas, self.mapas[int(mapa) - 1])
-        self.pos = posInicio(self.mapa)
+        self.mapa, self.lstMapa = cargarMapa(self.carpetaMapas, self.mapas[int(mapa) - 1])
+        self.pos = posInicio(self.lstMapa)
         return (self.mapa)
 
     def generarMapas(self):
@@ -79,22 +79,22 @@ class Jugador(object):
                 remplazo = nP
                 aviso = "Llave encontrada"
             elif self.lstMapa[nP[0]][nP[1]] == "O":
-                self.oro += 1
+                self.cantOro += 1
                 self.lstMapa[nP[0]][nP[1]] = "C"
                 remplazo = nP
                 aviso = "Oro encontrado"
             else:
                 aviso = "No hay nada que agarrar"
 
-        error, aviso, reemplazo = self.controlarNPos(nP, aviso)
+        error, aviso, remplazo = self.controlarNPos(nP, aviso)
 
         if error == "":
             self.pos = nP
 
-        return error, aviso, reemplazo
+        return error, aviso, remplazo
 
     def controlarNPos(self, pos, aviso):
-        error, remplazo = ""
+        error = remplazo = ""
         if controlarFinDeMapa(pos, len(self.lstMapa), len(self.lstMapa[0])):
             error = "Fin del Mapa"
         elif self.lstMapa[pos[0]][pos[1]] != "C":
@@ -105,7 +105,7 @@ class Jugador(object):
                     error = "No tenias suficiente oro y el guardia te mato"
                 else:
                     self.cantOro -= 1
-                    lista[pos[0]][pos[1]] = "C"
+                    self.lista[pos[0]][pos[1]] = "C"
                     remplazo = pos
                     aviso = "Le pagaste al guardia"
             if self.lstMapa[pos[0]][pos[1]] == "S" and not self.hasLlave:
@@ -159,14 +159,13 @@ def cargarMapa(carpeta, mapa):
             fl = f.readlines()
             for x in fl:
                 mandar += str(x.strip()) + ","
-                lista.append(list(x).strip())
+                lista.append(list(x.strip()))
     except FileNotFoundError:
         print("Archivo no encontrado\n")
     return mandar[:-1], lista
 
 
-def posInicio(mapa):
-    lista = convertirMapaALista(mapa)
+def posInicio(lista):
     for x in range(len(lista)):
         try:
             return x, lista[x].index("E")

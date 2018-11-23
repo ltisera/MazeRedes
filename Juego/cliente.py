@@ -99,6 +99,12 @@ def run_cliente():
                         for linea in data.get("dato").split(","):
                             mapa.append(list(linea))
                         rango = int(data.get("rango"))
+
+                        mensaje["juego"] = 1
+                        mensaje["comando"] = "d"
+                        mensaje = json.dumps(mensaje)
+                        sock.sendall(encriptar(mensaje))
+
                         estado = "Jugando"
                     elif(data.get("dato") is not None):
                         print(data.get("dato"))
@@ -111,17 +117,17 @@ def run_cliente():
                         mensaje = json.dumps(mensaje)
                         sock.sendall(encriptar(mensaje))
 
-                if(estado == "Jugando"):
+                elif(estado == "Jugando"):
                     if(data.get("juego") is not None):
                         pos = int(data.get("pos")[0]), int(data.get("pos")[1])
                         os.system("cls")
 
                         imprimirMapa(rango, pos, mapa)
-                        print("\n    Oro Actual: " + data.get("oro"))
+                        print("\n    Oro Actual: " + str(data.get("oro")))
                         if(data.get("error") is not None):
-                            print("    " + data.get("error"), end="\n\n")
+                            print("    " + data.get("error"), end="\n")
                         if(data.get("aviso") is not None):
-                            print("    " + data.get("aviso"), end="\n\n")
+                            print("    " + data.get("aviso"), end="\n")
                         if(data.get("remplazo") is not None):
                             mapa = remplazar(data.get("remplazo"), mapa)
                         print("\n\n    ¿Que desea hacer? ", end="")
@@ -132,6 +138,13 @@ def run_cliente():
                         mensaje["comando"] = comando
                         mensaje = json.dumps(mensaje)
                         sock.sendall(encriptar(mensaje))
+                    else:
+                        estado = "Conectado"
+                        mensaje["menu"] = 1
+                        mensaje["estado"] = "principal"
+                        mensaje = json.dumps(mensaje)
+                        sock.sendall(encriptar(mensaje))
+                        estado = "Conectado"
             else:
                 # No JSON
                 mensaje["Error"] = 1
@@ -171,7 +184,10 @@ def imprimirMapa(r, pos, lista):
         for y in range(len(lista[x])):
             if (x >= (int(pos[0]) - r) and x <= (int(pos[0]) + r) and
                 y >= (int(pos[1]) - r) and y <= (int(pos[1]) + r)):
-                    print(lista[x][y], end="")
+                    if x == pos[0] and y == pos[1]:
+                        print("J", end="")
+                    else:
+                        print(lista[x][y], end="")
             else:
                 print(" ", end="")
         print("")

@@ -149,23 +149,32 @@ def atenderJugadores(lstJugadores):
                             jugador.sock.sendall(encriptar(preMsg))
                     elif(dicServer.get("juego") is not None):
                         if(dicServer.get("comando") in lstComando):
-                            preMsg = {}
-                            cantParametros = 0
-                            error, aviso, remp = jugador.controlarComando(com)
-                            if (error != ""):
-                                preMsg["error"] = error
-                                cantParametros += 1
-                            if(aviso != ""):
-                                preMsg["aviso"] = aviso
-                                cantParametros += 1
-                            if(remp != ""):
-                                preMsg["reep"] = remp
-                                cantParametros += 1
-                            preMsg["pos"] = jugador.pos
-                            preMsg["oro"] = jugador.cantOro
-                            preMsg["juego"] = cantParametros + 2
-                            preMsg = json.dumps(preMsg)
-                            jugador.sock.sendall(encriptar(preMsg))
+                            if(dicServer.get("comando") in ("q", "salir")):
+                                preMsg = {}
+                                preMsg["menu"] = 2
+                                preMsg["dato"] = jugador.generarMenu()
+                                preMsg["estado"] = "principal"
+                                preMsg = json.dumps(preMsg)
+                                jugador.sock.sendall(encriptar(preMsg))
+                            else:
+                                preMsg = {}
+
+                                preMsg["juego"] = cantParametros = 0
+                                error, aviso, remp = jugador.controlarComando(dicServer.get("comando"))
+                                if (error != ""):
+                                    preMsg["error"] = error
+                                    cantParametros += 1
+                                if(aviso != ""):
+                                    preMsg["aviso"] = aviso
+                                    cantParametros += 1
+                                if(remp != ""):
+                                    preMsg["reep"] = remp
+                                    cantParametros += 1
+                                preMsg["pos"] = jugador.pos
+                                preMsg["oro"] = jugador.cantOro
+                                preMsg["juego"] = cantParametros + 2
+                                preMsg = json.dumps(preMsg)
+                                jugador.sock.sendall(encriptar(preMsg))
 
                 else:
                     sendErr = {}
