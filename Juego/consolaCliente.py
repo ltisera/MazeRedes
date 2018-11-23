@@ -43,29 +43,6 @@ def run_consola():
 	while salir is not True:
 		print("\nIngrese un comando: ")
 		comando = input()
-		"""
-		comando = comando[1:]
-		comando = comando[:-1]
-
-		dicComando = {}
-
-		print("este es el comando: ",comando)
-		comandoSpliteado = comando.split(",")
-		cnt = 0
-		for i in comandoSpliteado:
-			iSpliteado = i.split(":")
-			print(iSpliteado)
-			if(cnt == 0):
-				dicComando[iSpliteado[0]] = int(iSpliteado[1])
-			else:
-				dicComando[iSpliteado[0]] = iSpliteado[1]
-
-			cnt = cnt + 1
-		dicComando2 = json.dumps(dicComando)
-		print("diccomando: ",dicComando)
-
-
-		"""
 		sock.sendall(encriptar(comando))
 		dato = desencriptar(sock.recv(1024))
 		if(checkJSON(dato)):

@@ -111,7 +111,7 @@ def atenderJugadores(lstJugadores):
 
                     elif(dicServer.get("menu") is not None):
                         com = dicServer.get("comando")
-                        if(com is None or com in ["q", "salir"]):
+                        if(com is None or com in ["q", "salir", ""]):
                             # Menu Principal
                             preMsg = {}
                             preMsg["menu"] = 2
