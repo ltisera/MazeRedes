@@ -57,10 +57,10 @@ def run_cliente():
 
         if(estado == "Desconectado"):
             sock = crearConexion()
+            os.system("cls")
             estado = "Deslogueado"
 
         elif(estado == "Deslogueado"):
-            os.system("cls")
             print("Ingresa Usuario:")
             usuario = input()
             print("Ingresa password:")
@@ -72,6 +72,7 @@ def run_cliente():
             mensaje = json.dumps(mensaje)
             sock.sendall(encriptar(mensaje))
 
+            os.system("cls")
             estado = "EsperandoLogin"
 
         else:
@@ -88,8 +89,7 @@ def run_cliente():
                         sock.sendall(encriptar(mensaje))
                     else:
                         estado = "Deslogueado"
-                        print("Usuario y/o contraseña incorrecto")
-                        os.system("pause")
+                        print("Usuario y/o contraseña incorrecto\n")
 
                 elif(estado == "Conectado"):
                     os.system("cls")
@@ -118,26 +118,37 @@ def run_cliente():
                         sock.sendall(encriptar(mensaje))
 
                 elif(estado == "Jugando"):
+                    os.system("cls")
                     if(data.get("juego") is not None):
-                        pos = int(data.get("pos")[0]), int(data.get("pos")[1])
-                        os.system("cls")
+                        if(data.get("gameOver") is None):
+                            pos = int(data.get("pos")[0]), int(data.get("pos")[1])
+                            imprimirMapa(rango, pos, mapa)
+                            print("\n    Oro Actual: " + str(data.get("oro")))
+                            if(data.get("error") is not None):
+                                print("    " + data.get("error"), end="\n")
+                            if(data.get("aviso") is not None):
+                                print("    " + data.get("aviso"), end="\n")
+                            if(data.get("remplazo") is not None):
+                                print(data.get("remplazo"))
+                                mapa = remplazar(data.get("remplazo"), mapa)
+                                os.system("pause")
+                            print("\n\n    ¿Que desea hacer? ", end="")
 
-                        imprimirMapa(rango, pos, mapa)
-                        print("\n    Oro Actual: " + str(data.get("oro")))
-                        if(data.get("error") is not None):
-                            print("    " + data.get("error"), end="\n")
-                        if(data.get("aviso") is not None):
-                            print("    " + data.get("aviso"), end="\n")
-                        if(data.get("remplazo") is not None):
-                            mapa = remplazar(data.get("remplazo"), mapa)
-                        print("\n\n    ¿Que desea hacer? ", end="")
+                            comando = input().lower()
 
-                        comando = input().lower()
-
-                        mensaje["juego"] = 1
-                        mensaje["comando"] = comando
-                        mensaje = json.dumps(mensaje)
-                        sock.sendall(encriptar(mensaje))
+                            mensaje["juego"] = 1
+                            mensaje["comando"] = comando
+                            mensaje = json.dumps(mensaje)
+                            sock.sendall(encriptar(mensaje))
+                        else:
+                            print(data.get("gameOver") + "\n\n")
+                            estado = "Conectado"
+                            mensaje["menu"] = 1
+                            mensaje["estado"] = "principal"
+                            mensaje = json.dumps(mensaje)
+                            sock.sendall(encriptar(mensaje))
+                            os.system("pause")
+                            estado = "Conectado"
                     else:
                         estado = "Conectado"
                         mensaje["menu"] = 1

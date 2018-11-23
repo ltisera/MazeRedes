@@ -162,13 +162,20 @@ def atenderJugadores(lstJugadores):
                                 preMsg["juego"] = cantParametros = 0
                                 error, aviso, remp = jugador.controlarComando(dicServer.get("comando"))
                                 if (error != ""):
-                                    preMsg["error"] = error
+                                    if(error == "Muerte"):
+                                        preMsg["gameOver"] = "Perdiste :c"
+                                    else:
+                                        preMsg["error"] = error
                                     cantParametros += 1
+
                                 if(aviso != ""):
-                                    preMsg["aviso"] = aviso
+                                    if(aviso == "Ganaste"):
+                                        preMsg["gameOver"] = "Ganaste :D"
+                                    else:
+                                        preMsg["aviso"] = aviso
                                     cantParametros += 1
                                 if(remp != ""):
-                                    preMsg["reep"] = remp
+                                    preMsg["remplazo"] = remp
                                     cantParametros += 1
                                 preMsg["pos"] = jugador.pos
                                 preMsg["oro"] = jugador.cantOro

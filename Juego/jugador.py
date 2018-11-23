@@ -86,15 +86,15 @@ class Jugador(object):
             else:
                 aviso = "No hay nada que agarrar"
 
-        error, aviso, remplazo = self.controlarNPos(nP, aviso)
+        error, aviso, remplazo = self.controlarNPos(nP, aviso, remplazo)
 
         if error == "":
             self.pos = nP
 
         return error, aviso, remplazo
 
-    def controlarNPos(self, pos, aviso):
-        error = remplazo = ""
+    def controlarNPos(self, pos, aviso, remplazo):
+        error = ""
         if controlarFinDeMapa(pos, len(self.lstMapa), len(self.lstMapa[0])):
             error = "Fin del Mapa"
         elif self.lstMapa[pos[0]][pos[1]] != "C":
@@ -102,14 +102,17 @@ class Jugador(object):
                 error = "No se pueden atravesar las paredes"
             if self.lstMapa[pos[0]][pos[1]] == "G":
                 if self.cantOro <= 0:
-                    error = "No tenias suficiente oro y el guardia te mato"
+                    error = "Muerte"
                 else:
                     self.cantOro -= 1
                     self.lstMapa[pos[0]][pos[1]] = "C"
                     remplazo = pos
                     aviso = "Le pagaste al guardia"
-            if self.lstMapa[pos[0]][pos[1]] == "S" and not self.hasLlave:
-                error = "La salida esta cerrada"
+            if self.lstMapa[pos[0]][pos[1]] == "S":
+                if self.hasLlave:
+                    aviso = "Ganaste"
+                else:
+                    error = "La salida esta cerrada"
         return error, aviso, remplazo
 
 
