@@ -151,12 +151,15 @@ def atenderJugadores(lstJugadores):
                         if(dicServer.get("comando") in lstComando):
                             preMsg = {}
                             cantParametros = 0
-                            error, aviso = jugador.controlarComando(com)
+                            error, aviso, remp = jugador.controlarComando(com)
                             if (error != ""):
                                 preMsg["error"] = error
                                 cantParametros += 1
                             if(aviso != ""):
                                 preMsg["aviso"] = aviso
+                                cantParametros += 1
+                            if(remp != ""):
+                                preMsg["reep"] = remp
                                 cantParametros += 1
                             preMsg["pos"] = jugador.pos
                             preMsg["oro"] = jugador.cantOro

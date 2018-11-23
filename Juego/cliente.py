@@ -122,6 +122,8 @@ def run_cliente():
                             print("    " + data.get("error"), end="\n\n")
                         if(data.get("aviso") is not None):
                             print("    " + data.get("aviso"), end="\n\n")
+                        if(data.get("remplazo") is not None):
+                            mapa = remplazar(data.get("remplazo"), mapa)
                         print("\n\n    ¿Que desea hacer? ", end="")
 
                         comando = input().lower()
@@ -138,6 +140,11 @@ def run_cliente():
                 sock.sendall(encriptar(mensaje))
 
     sock.close()
+
+
+def remplazar(json, lista):
+    lista[int(json[0])][int(json[1])] = "C"
+    return lista
 
 
 def imprimirMapa(r, pos, lista):

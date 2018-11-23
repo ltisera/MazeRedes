@@ -62,7 +62,7 @@ class Jugador(object):
 
     def controlarComando(self, comando):
         nP = self.pos
-        error = aviso = ""
+        error = aviso = remplazo = ""
 
         if comando == "a":
             nP = (self.pos[0], self.pos[1] - 1)
@@ -76,23 +76,25 @@ class Jugador(object):
             if self.lstMapa[nP[0]][nP[1]] == "K":
                 self.hasLlave = True
                 self.lstMapa[nP[0]][nP[1]] = "C"
+                remplazo = nP
                 aviso = "Llave encontrada"
             elif self.lstMapa[nP[0]][nP[1]] == "O":
                 self.oro += 1
                 self.lstMapa[nP[0]][nP[1]] = "C"
+                remplazo = nP
                 aviso = "Oro encontrado"
             else:
                 aviso = "No hay nada que agarrar"
 
-        error, aviso = self.controlarNPos(nP, aviso)
+        error, aviso, reemplazo = self.controlarNPos(nP, aviso)
 
         if error == "":
             self.pos = nP
 
-        return error, aviso
+        return error, aviso, reemplazo
 
     def controlarNPos(self, pos, aviso):
-        error = ""
+        error, remplazo = ""
         if controlarFinDeMapa(pos, len(self.lstMapa), len(self.lstMapa[0])):
             error = "Fin del Mapa"
         elif self.lstMapa[pos[0]][pos[1]] != "C":
@@ -104,10 +106,11 @@ class Jugador(object):
                 else:
                     self.cantOro -= 1
                     lista[pos[0]][pos[1]] = "C"
+                    remplazo = pos
                     aviso = "Le pagaste al guardia"
             if self.lstMapa[pos[0]][pos[1]] == "S" and not self.hasLlave:
                 error = "La salida esta cerrada"
-        return error, aviso
+        return error, aviso, remplazo
 
 
 """
