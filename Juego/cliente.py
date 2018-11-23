@@ -129,9 +129,7 @@ def run_cliente():
                             if(data.get("aviso") is not None):
                                 print("    " + data.get("aviso"), end="\n")
                             if(data.get("remplazo") is not None):
-                                print(data.get("remplazo"))
                                 mapa = remplazar(data.get("remplazo"), mapa)
-                                os.system("pause")
                             print("\n\n    ¿Que desea hacer? ", end="")
 
                             comando = input().lower()
