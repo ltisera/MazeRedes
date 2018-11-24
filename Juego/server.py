@@ -94,10 +94,10 @@ def atenderJugadores(lstJugadores):
     for jugador in lstJugadores:
         # Recibe los datos en trozos y reetransmite
         try:
-
-            data = desencriptar(jugador.sock.recv(1024))
-            print("dato recibido: ", data)
+            data = jugador.sock.recv(1024)
             if(data):
+                data = desencriptar(data)
+                print("dato recibido: ", data)
                 if (checkJSON(data)):
                     dicServer = json.loads(data)
                     print("dicServer: ", dicServer.get("login"))
